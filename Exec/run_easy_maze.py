@@ -49,6 +49,6 @@ if __name__ == "__main__":
     env = MazeSimulator(5, 4, [0, 0], True)
     RL = QLearningTable(actions=list(range(env.n_actions)))
 
-    env.after(1, running(10, 0.001, True))
+    env.after(1, running(10, 0.01, True))
     env.mainloop()
     print(RL.q_table)

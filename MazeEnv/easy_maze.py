@@ -33,6 +33,7 @@ class MazeSimulator(tk.Tk, object):
         self.set_fixed_obj([3, 3], 1, True)
         self.set_fixed_obj([1, 2], -1, True)
         self.set_fixed_obj([2, 1], -1, True)
+        self.set_fixed_obj([3, 1], -1, True)
         self._build_maze()
 
     def _init_grid(self):
@@ -140,7 +141,8 @@ class MazeSimulator(tk.Tk, object):
         else:
             reward = 0
             is_done = False
-        print(self.agent)
+        if is_done:
+            print(self.agent)
         return self.agent, reward, is_done
 
     def render(self, time_in_ms):
