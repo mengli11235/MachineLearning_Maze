@@ -12,8 +12,8 @@ else:
 
 
 UNIT = 40   # pixels
-MAZE_ROW = 5  # maze rows
-MAZE_CLM = 4  # maze column
+MAZE_ROW = 10  # maze rows
+MAZE_CLM = 10  # maze column
 
 
 class Maze(tk.Tk, object):
@@ -23,7 +23,29 @@ class Maze(tk.Tk, object):
         self.n_actions = len(self.available_action)
         self.title('maze')
         self.geometry('{0}x{1}'.format(MAZE_CLM * UNIT, MAZE_ROW * UNIT))
+        self.origin = np.array([20, 20])
+        self.hells = np.array([[3,6], [3,7],[3, 8],[4, 6],[5, 6],[6, 6],[6, 7],[6, 8],[7, 8],[8, 6],[8, 7],[8,8],[9, 6]], np.float64)
+        self.hellcoords=list()
+        self.paradises = np.array([[5,7]], np.float64)
+        self.paradisecoords=list()
         self._build_maze()
+
+    # create a ground type, it can be either positive(paradise) or negative(hell) rewarded
+    def create_ground(self,coord,ground_type):
+        gr_center = self.origin + np.array([UNIT * (coord[0]), UNIT * (coord[1])])
+        if ground_type == 'paradise':
+            ground = self.canvas.create_oval(
+                        gr_center[0] - 15, gr_center[1] - 15,
+                        gr_center[0] + 15, gr_center[1] + 15,
+                        fill='yellow')
+            self.hellcoords.append(self.canvas.coords(ground))
+        elif ground_type == 'hell':
+            ground = self.canvas.create_rectangle(
+                        gr_center[0] - 15, gr_center[1] - 15,
+                        gr_center[0] + 15, gr_center[1] + 15,
+                        fill='black')
+            self.paradisecoords.append(self.canvas.coords(ground))
+        return ground
 
     def _build_maze(self):
         self.canvas = tk.Canvas(self, bg='white',
@@ -38,35 +60,17 @@ class Maze(tk.Tk, object):
             x0, y0, x1, y1 = 0, r, MAZE_ROW * UNIT, r
             self.canvas.create_line(x0, y0, x1, y1)
 
-        # create origin
-        origin = np.array([20, 20])
-
-        # hell
-        hell1_center = origin + np.array([UNIT * 2, UNIT])
-        self.hell1 = self.canvas.create_rectangle(
-            hell1_center[0] - 15, hell1_center[1] - 15,
-            hell1_center[0] + 15, hell1_center[1] + 15,
-            fill='black')
-        # hell
-        hell2_center = origin + np.array([UNIT, UNIT * 2])
-        self.hell2 = self.canvas.create_rectangle(
-            hell2_center[0] - 15, hell2_center[1] - 15,
-            hell2_center[0] + 15, hell2_center[1] + 15,
-            fill='black')
-
-        # create oval
-        oval_center = origin + UNIT * 3
-        self.oval = self.canvas.create_oval(
-            oval_center[0] - 15, oval_center[1] - 15,
-            oval_center[0] + 15, oval_center[1] + 15,
-            fill='yellow')
+        # now just an illustration on how to build different types of maze ground, we shall carefully designate it later
+        for row in self.hells:
+            self.create_ground(row, 'hell')
+        for row in self.paradises:
+            self.create_ground(row, 'paradise')
 
         # create red rect
         self.rect = self.canvas.create_rectangle(
-            origin[0] - 15, origin[1] - 15,
-            origin[0] + 15, origin[1] + 15,
+            self.origin[0] - 15, self.origin[1] - 15,
+            self.origin[0] + 15, self.origin[1] + 15,
             fill='red')
-
         # pack all
         self.canvas.pack()
 
@@ -74,10 +78,9 @@ class Maze(tk.Tk, object):
         self.update()
         time.sleep(0.5)
         self.canvas.delete(self.rect)
-        origin = np.array([20, 20])
         self.rect = self.canvas.create_rectangle(
-            origin[0] - 15, origin[1] - 15,
-            origin[0] + 15, origin[1] + 15,
+            self.origin[0] - 15, self.origin[1] - 15,
+            self.origin[0] + 15, self.origin[1] + 15,
             fill='red')
         # return observation
         return self.canvas.coords(self.rect)
@@ -101,17 +104,19 @@ class Maze(tk.Tk, object):
         self.canvas.move(self.rect, base_action[0], base_action[1])  # move agent
 
         s_ = self.canvas.coords(self.rect)  # next state
+        print(s_)
 
         # reward function
-        if s_ == self.canvas.coords(self.oval):
-            reward = 1
-            done = True
-        elif s_ in [self.canvas.coords(self.hell1), self.canvas.coords(self.hell2)]:
-            reward = -1
-            done = True
-        else:
-            reward = 0
-            done = False
+        reward = 0
+        done = False
+        for row in self.hellcoords:
+            if s_ == row:
+                reward = 1
+                done = True
+        for row in self.paradisecoords:
+            if s_ == row:
+                reward = -1
+                done = True
 
         return s_, reward, done
 

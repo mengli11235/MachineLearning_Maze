@@ -36,6 +36,7 @@ def update():
 
             # break while loop when end of this episode
             if done:
+                print('finished one run')
                 break
 
     # end of game
