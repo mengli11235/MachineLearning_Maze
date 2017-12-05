@@ -30,11 +30,6 @@ class MazeSimulator(tk.Tk, object):
 
         self._init_grid()
         self.set_agent()
-        self.set_fixed_obj([3, 3], 1, True)
-        self.set_fixed_obj([1, 2], -1, True)
-        self.set_fixed_obj([2, 1], -1, True)
-        self.set_fixed_obj([3, 1], -1, True)
-        self._build_maze()
 
     def _init_grid(self):
         if self.is_render:
@@ -56,6 +51,9 @@ class MazeSimulator(tk.Tk, object):
         self.agent = [self.init_position[0], self.init_position[1]]
 
         if self.is_render:
+            # create origin coord
+            self.origin_coord = np.array(
+                [self.anchor, self.anchor])
             # create agent in Maze
             self.agent_coord = np.array(
                 [self.anchor + (self.pixel * self.agent[0]), self.anchor + (self.pixel * self.agent[1])])
@@ -70,7 +68,7 @@ class MazeSimulator(tk.Tk, object):
 
         if self.is_render:
             # draw this object
-            new_obj = self.agent_coord + np.array([self.pixel * position[0], self.pixel * position[1]])
+            new_obj = self.origin_coord + np.array([self.pixel * position[0], self.pixel * position[1]])
             if reward < 0:
                 self.canvas.create_rectangle(
                     new_obj[0] - 15, new_obj[1] - 15,
@@ -87,7 +85,7 @@ class MazeSimulator(tk.Tk, object):
                     new_obj[0] + 15, new_obj[1] + 15,
                     fill='white')
 
-    def _build_maze(self):
+    def build_maze(self):
         if self.is_render:
             # pack all
             self.canvas.pack()
@@ -141,7 +139,7 @@ class MazeSimulator(tk.Tk, object):
         else:
             reward = 0
             is_done = False
-        if is_done:
+        if is_done and self.is_render:
             print(self.agent)
         return self.agent, reward, is_done
 

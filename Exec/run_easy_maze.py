@@ -13,7 +13,7 @@ from MazeEnv.easy_maze import MazeSimulator
 from LearningAlgos.easy_maze_RL import QLearningTable
 import time
 
-def running(epi, time_in_ms, is_render, QL):
+def running(epi, time_in_ms, is_render, QL, env):
     for episode in range(epi):
         # initiate the agent
         agent = env.reset()
@@ -43,13 +43,35 @@ def running(epi, time_in_ms, is_render, QL):
     if is_render:
         time.sleep(1)
         env.destroy()
-
     print(QL.q_table)
 
 
 if __name__ == "__main__":
-    env = MazeSimulator(5, 4, [0, 0], True)
-    QLearner = QLearningTable(actions=list(range(env.n_actions)))
+    # set if render the GUI
+    is_render = True
+    # set number of runs
+    episodes = 30
+    # animation interval
+    interval = 0.02
+    # initial position of the agent
+    init_pos = [2, 3]
 
-    env.after(1, running(10, 0.01, True, QLearner))
-    env.mainloop()
+    # initiate maze simulator
+    maze = MazeSimulator(5, 4, init_pos, is_render)
+
+    # set fixed object ([column, row], reward, isFinishedWhenReach)
+    maze.set_fixed_obj([3, 3], 1, True)
+    maze.set_fixed_obj([1, 2], -1, True)
+    maze.set_fixed_obj([2, 1], -1, True)
+    maze.set_fixed_obj([2, 4], 1, True)
+
+    # build the rendered maze
+    maze.build_maze()
+    QLearner = QLearningTable(actions=list(range(maze.n_actions)))
+
+    # run the simulation of training
+    if is_render:
+        maze.after(1, running(episodes, interval, is_render, QLearner, maze))
+        maze.mainloop()
+    else:
+        running(episodes, interval, is_render, QLearner, maze)
