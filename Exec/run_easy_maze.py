@@ -13,7 +13,7 @@ from MazeEnv.easy_maze import MazeSimulator
 from LearningAlgos.easy_maze_RL import QLearningTable
 import time
 
-def running(epi, time_in_ms, is_render):
+def running(epi, time_in_ms, is_render, QL):
     for episode in range(epi):
         # initiate the agent
         agent = env.reset()
@@ -23,13 +23,13 @@ def running(epi, time_in_ms, is_render):
             env.render(time_in_ms)
 
             # RL choose action based on observation
-            action = RL.choose_action(str(agent))
+            action = QL.choose_action(str(agent))
 
             # RL take action and get next observation and reward
             new_state, reward, is_done = env.taking_action(action)
 
             # RL learn from this transition
-            RL.learn(str(agent), action, reward, str(new_state))
+            QL.learn(str(agent), action, reward, str(new_state), is_done)
 
             # swap observation
             agent = new_state
@@ -44,11 +44,12 @@ def running(epi, time_in_ms, is_render):
         time.sleep(1)
         env.destroy()
 
+    print(QL.q_table)
+
 
 if __name__ == "__main__":
     env = MazeSimulator(5, 4, [0, 0], True)
-    RL = QLearningTable(actions=list(range(env.n_actions)))
+    QLearner = QLearningTable(actions=list(range(env.n_actions)))
 
-    env.after(1, running(10, 0.01, True))
+    env.after(1, running(10, 0.01, True, QLearner))
     env.mainloop()
-    print(RL.q_table)
