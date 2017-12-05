@@ -11,9 +11,16 @@ View more on my tutorial page: https://morvanzhou.github.io/tutorials/
 
 from MazeEnv.easy_maze import MazeSimulator
 from LearningAlgos.easy_maze_RL import QLearningTable
+import pandas as pd
 import time
 
 def running(epi, time_in_ms, is_render, QL, env):
+    try:
+        df = pd.DataFrame.from_csv('temp_q_table.csv', sep=',', encoding='utf8')
+        QL.set_prior_qtable(df)
+    except Exception:
+        pass
+
     for episode in range(epi):
         # initiate the agent
         agent = env.reset()
@@ -43,14 +50,16 @@ def running(epi, time_in_ms, is_render, QL, env):
     if is_render:
         time.sleep(1)
         env.destroy()
+
+    QL.q_table.to_csv("temp_q_table.csv", sep=',', encoding='utf-8')
     print(QL.q_table)
 
 
 if __name__ == "__main__":
     # set if render the GUI
-    is_render = True
+    is_render = False
     # set number of runs
-    episodes = 30
+    episodes = 30000
     # animation interval
     interval = 0.02
     # set the size of maze: column x row

@@ -16,6 +16,9 @@ class QLearningTable:
         self.epsilon = e_greedy
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
 
+    def set_prior_qtable(self, df_qtable):
+        self.q_table = df_qtable
+
     def choose_action(self, observation):
         self.check_state_exist(observation)
         # action selection
