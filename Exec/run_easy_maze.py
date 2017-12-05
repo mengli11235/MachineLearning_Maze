@@ -53,11 +53,14 @@ if __name__ == "__main__":
     episodes = 30
     # animation interval
     interval = 0.02
+    # set the size of maze: column x row
+    size_maze = [4, 8]
     # initial position of the agent
-    init_pos = [2, 3]
+    # all position count from 0
+    init_pos = [0, 7]
 
     # initiate maze simulator
-    maze = MazeSimulator(5, 4, init_pos, is_render)
+    maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
 
     # set fixed object ([column, row], reward, isFinishedWhenReach)
     maze.set_fixed_obj([3, 3], 1, True)
