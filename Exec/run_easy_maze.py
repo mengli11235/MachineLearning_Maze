@@ -25,13 +25,14 @@ def learning(epi, time_in_ms, _is_render, QL, env):
             env.render(time_in_ms)
 
             # RL choose action based on observation
-            action = QL.choose_action(str(agent))
+            current_state = str(agent)
+            action = QL.choose_action(current_state)
 
             # RL take action and get next observation and reward
             new_state, reward, is_done = env.taking_action(action)
 
             # RL learn from this transition
-            QL.learn(str(agent), action, reward, str(new_state), is_done)
+            QL.learn(current_state, action, reward, str(new_state), is_done)
 
             # swap observation
             agent = new_state
@@ -90,7 +91,7 @@ if __name__ == "__main__":
     # set if render the GUI
     is_render = False
     # set number of runs
-    episodes = 50000
+    episodes = 30000
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -115,7 +116,7 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.01
     reward_gamma = 0.9
-    greedy = 0.99
+    greedy = 0.9
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
 
     # run the simulation of training
@@ -125,5 +126,5 @@ if __name__ == "__main__":
     else:
         learning(episodes, interval, is_render, QLearner, maze)
 
-    # running(50, interval, is_render, QLearner, maze)
+    #running(50, interval, is_render, QLearner, maze)
 

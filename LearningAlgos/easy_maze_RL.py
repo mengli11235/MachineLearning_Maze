@@ -20,6 +20,7 @@ class QLearningTable:
         self.q_table = df_qtable
 
     def choose_action(self, observation):
+        # print()
         self.check_state_exist(observation)
         # action selection
         if np.random.uniform() < self.epsilon:
