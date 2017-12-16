@@ -32,6 +32,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
             # break while loop when end of this episode
             if is_done:
+                print(episode/epi)
                 break
 
     # end of game
@@ -100,7 +101,8 @@ if __name__ == "__main__":
     # set fixed object ([column, row], reward, isFinishedWhenReach)
     # set rewards
     # maze.set_fixed_obj([3, 4], 1, True)
-    demo_maze.set_fixed_obj([3, 4], 1, True)
+    # demo_maze.set_fixed_obj([3, 4], 1, True)
+    demo_maze.set_key_chest([3,0], [3,5], 'key', 3)
     # maze.set_fixed_obj([1, 3], 1, True)
     # demo_maze.set_fixed_obj([1, 3], 1, True)
     # maze.set_collect_all_rewards([[3, 4], [1, 3]], 1, "golds")
@@ -108,9 +110,9 @@ if __name__ == "__main__":
 
     # set traps
     # maze.set_fixed_obj([1, 2], -1, True)
-    demo_maze.set_fixed_obj([1, 2], -1, True)
+    # demo_maze.set_fixed_obj([1, 2], -1, True)
     # maze.set_fixed_obj([2, 1], -1, True)
-    demo_maze.set_fixed_obj([2, 1], -1, True)
+    # demo_maze.set_fixed_obj([2, 1], -1, True)
 
     # build the rendered maze
     maze.build_maze()
@@ -118,20 +120,20 @@ if __name__ == "__main__":
 
     # initiate QLearner
     actions = list(range(maze.n_actions))
-    learning_rate = 0.01
-    reward_gamma = 0.9
-    greedy = 0.7
+    learning_rate = 0.1
+    reward_gamma = 0.8
+    greedy = 0.8
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
 
     # run the simulation of training
-    if is_render:
-        maze.after(1, learning(episodes, interval, is_render, QLearner, maze))
-        maze.mainloop()
-    else:
-        learning(episodes, interval, is_render, QLearner, maze)
+    # if is_render:
+    #     maze.after(1, learning(episodes, interval, is_render, QLearner, maze))
+    #     maze.mainloop()
+    # else:
+    #     learning(episodes, interval, is_render, QLearner, maze)
 
     # Q decision with 99% greedy strategy
-    demo_greedy = 0.99
-    demo_interval = 0.2
+    demo_greedy = 1
+    demo_interval = 0.01
     QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy)
     running(50, demo_interval, True, QRunner, demo_maze)

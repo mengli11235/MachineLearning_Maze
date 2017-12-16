@@ -4,11 +4,7 @@ Reinforcement learning maze
 
 import numpy as np
 import time
-import sys
-if sys.version_info.major == 2:
-    import Tkinter as tk
-else:
-    import tkinter as tk
+import tkinter as tk
 
 
 class MazeSimulator(tk.Tk, object):
@@ -20,6 +16,10 @@ class MazeSimulator(tk.Tk, object):
     final_object_list = []
     ending_con_map = {} #dictionary
     agent_con_map = {}
+
+    key_list = []
+    chest_list = []
+    agent_keys = []
 
     def __init__(self, grid_height, grid_width, init_position, is_render):
         if is_render:
@@ -88,6 +88,23 @@ class MazeSimulator(tk.Tk, object):
                     new_obj[0] + 15, new_obj[1] + 15,
                     fill='white')
 
+    def set_key_chest(self, key_position, reward_position, key, reward):
+        self.key_list.append([key_position, key])
+        self.chest_list.append([reward_position, key, reward])
+
+        if self.is_render:
+            # draw this object
+            key_obj = self.origin_coord + np.array([self.pixel * key_position[0], self.pixel * key_position[1]])
+            self.canvas.create_text(
+                key_obj[0], key_obj[1],
+                fill='black', text="key")
+
+            chest_obj = self.origin_coord + np.array([self.pixel * reward_position[0], self.pixel * reward_position[1]])
+            self.canvas.create_rectangle(
+                chest_obj[0] - 15, chest_obj[1] - 15,
+                chest_obj[0] + 15, chest_obj[1] + 15,
+                fill='yellow')
+
     def set_collect_all_rewards(self, reward_position_list, reward, flag_name):
         for ind_pos in reward_position_list:
             self.set_fixed_obj(ind_pos, reward, flag_name)
@@ -104,6 +121,7 @@ class MazeSimulator(tk.Tk, object):
         self.agent[1] = self.init_position[1]
         self.agent_con_map = {}
         self.object_list = self.final_object_list[:]
+        self.agent_keys = []
 
         if self.is_render:
             self.update()
@@ -165,11 +183,29 @@ class MazeSimulator(tk.Tk, object):
             else:
                 is_done = is_done_content
         else:
-            reward = 0
-            is_done = False
+            reward, is_done = self.check_key_chest(self.agent)
+
         if is_done and self.is_render:
             print(self.agent)
         return self.agent, reward, is_done
+
+    def check_key_chest(self, new_position):
+        found_key = [obj for obj in self.key_list if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]
+        checked_reward = 0
+        checked_done = False
+        if len(found_key) > 0:
+            for key_obj in found_key:
+                if key_obj[1] not in self.agent_keys:
+                    self.agent_keys.append(key_obj[1])
+        else:
+            found_chest = [obj for obj in self.chest_list if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]
+            if len(found_chest) > 0:
+                for chest in found_chest:
+                    chest_key = chest[1]
+                    if chest_key in self.agent_keys:
+                        checked_reward = chest[2]
+                        checked_done = True
+        return checked_reward, checked_done
 
     def render(self, time_in_ms):
         if self.is_render:
