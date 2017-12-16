@@ -91,7 +91,7 @@ if __name__ == "__main__":
     # set if render the GUI
     is_render = False
     # set number of runs
-    episodes = 5000
+    episodes = 1000
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -105,14 +105,19 @@ if __name__ == "__main__":
     demo_maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, True)
 
     # set fixed object ([column, row], reward, isFinishedWhenReach)
-    maze.set_fixed_obj([3, 3], 1, True)
-    demo_maze.set_fixed_obj([3, 3], 1, True)
-    maze.set_fixed_obj([1, 2], -1, True)
+    # set rewards
+    # maze.set_fixed_obj([3, 4], 1, True)
+    demo_maze.set_fixed_obj([3, 4], 1, True)
+    # maze.set_fixed_obj([1, 3], 1, True)
+    # demo_maze.set_fixed_obj([1, 3], 1, True)
+    # maze.set_collect_all_rewards([[3, 4], [1, 3]], 1, "golds")
+    # demo_maze.set_collect_all_rewards([[3, 4], [1, 3]], 1, "golds")
+
+    # set traps
+    # maze.set_fixed_obj([1, 2], -1, True)
     demo_maze.set_fixed_obj([1, 2], -1, True)
-    maze.set_fixed_obj([2, 1], -1, True)
+    # maze.set_fixed_obj([2, 1], -1, True)
     demo_maze.set_fixed_obj([2, 1], -1, True)
-    maze.set_fixed_obj([2, 4], 1, True)
-    demo_maze.set_fixed_obj([2, 4], 1, True)
 
     # build the rendered maze
     maze.build_maze()
@@ -122,7 +127,7 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.01
     reward_gamma = 0.9
-    greedy = 0.9
+    greedy = 0.7
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
 
     # run the simulation of training
@@ -137,4 +142,3 @@ if __name__ == "__main__":
     demo_interval = 0.2
     QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy)
     running(50, demo_interval, True, QRunner, demo_maze)
-
