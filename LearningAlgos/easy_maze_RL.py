@@ -31,7 +31,7 @@ class QLearningTable:
         else:
             # choose random action
             action = np.random.choice(self.actions)
-        return action
+        return int(action)
 
     def learn(self, s, a, r, s_, is_done):
         self.check_state_exist(s_)

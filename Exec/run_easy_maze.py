@@ -91,7 +91,7 @@ if __name__ == "__main__":
     # set if render the GUI
     is_render = False
     # set number of runs
-    episodes = 30000
+    episodes = 5000
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -100,17 +100,23 @@ if __name__ == "__main__":
     # all position count from 0
     init_pos = [0, 0]
 
-    # initiate maze simulator
+    # initiate maze simulator for learning and running
     maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
+    demo_maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, True)
 
     # set fixed object ([column, row], reward, isFinishedWhenReach)
     maze.set_fixed_obj([3, 3], 1, True)
+    demo_maze.set_fixed_obj([3, 3], 1, True)
     maze.set_fixed_obj([1, 2], -1, True)
+    demo_maze.set_fixed_obj([1, 2], -1, True)
     maze.set_fixed_obj([2, 1], -1, True)
+    demo_maze.set_fixed_obj([2, 1], -1, True)
     maze.set_fixed_obj([2, 4], 1, True)
+    demo_maze.set_fixed_obj([2, 4], 1, True)
 
     # build the rendered maze
     maze.build_maze()
+    demo_maze.build_maze()
 
     # initiate QLearner
     actions = list(range(maze.n_actions))
@@ -126,5 +132,9 @@ if __name__ == "__main__":
     else:
         learning(episodes, interval, is_render, QLearner, maze)
 
-    #running(50, interval, is_render, QLearner, maze)
+    # Q decision with 99% greedy strategy
+    demo_greedy = 0.99
+    demo_interval = 0.2
+    QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy)
+    running(50, demo_interval, True, QRunner, demo_maze)
 
