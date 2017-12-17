@@ -135,7 +135,7 @@ class MazeSimulator(tk.Tk, object):
                 fill='red')
 
         # return position of agent
-        return self.agent
+        return np.array(self.agent[:])
 
     def taking_action(self, action):
         state = self.agent
@@ -187,7 +187,7 @@ class MazeSimulator(tk.Tk, object):
 
         if is_done and self.is_render:
             print(self.agent)
-        return self.agent, reward, is_done
+        return np.array(self.agent[:]), reward, is_done
 
     def check_key_chest(self, new_position):
         found_key = [obj for obj in self.key_list if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]
