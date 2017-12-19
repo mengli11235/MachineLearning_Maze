@@ -11,7 +11,6 @@ def learning(epi, time_in_ms, _is_render, QL, env):
         while True:
             # fresh env
             env.render(time_in_ms)
-
             # QL choose action based on observation
             action = QL.choose_action(observation)
 
@@ -72,7 +71,6 @@ if __name__ == "__main__":
     # set rewards
     # maze.set_fixed_obj([3, 4], 1, True)
     # demo_maze.set_fixed_obj([3, 4], 1, True)
-    maze.set_key_chest([3, 0], [3, 5], 'key', 3)
     # maze.set_fixed_obj([1, 3], 1, True)
     # demo_maze.set_fixed_obj([1, 3], 1, True)
     # maze.set_collect_all_rewards([[3, 4], [1, 3]], 1, "golds")
@@ -92,7 +90,7 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.8
-    greedy = 0.8
+    greedy = 0.9
     QLearner = DeepQNetwork(4, 2,
                                         learning_rate,
                                         reward_decay=reward_gamma,
