@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # set rewards
     # maze.set_fixed_obj([3, 4], 1, True)
     # demo_maze.set_fixed_obj([3, 4], 1, True)
-    demo_maze.set_key_chest([3,0], [3,5], 'key', 3)
+    demo_maze.set_key_chest([0,5], [3,0], 'key', 3)
     # maze.set_fixed_obj([1, 3], 1, True)
     # demo_maze.set_fixed_obj([1, 3], 1, True)
     # maze.set_collect_all_rewards([[3, 4], [1, 3]], 1, "golds")
@@ -110,9 +110,9 @@ if __name__ == "__main__":
 
     # set traps
     # maze.set_fixed_obj([1, 2], -1, True)
-    # demo_maze.set_fixed_obj([1, 2], -1, True)
+    demo_maze.set_fixed_obj([1, 2], -1, True)
     # maze.set_fixed_obj([2, 1], -1, True)
-    # demo_maze.set_fixed_obj([2, 1], -1, True)
+    demo_maze.set_fixed_obj([2, 1], -1, True)
 
     # build the rendered maze
     maze.build_maze()
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.8
-    greedy = 0.8
+    greedy = 0.85
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
 
     # run the simulation of training
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     #     learning(episodes, interval, is_render, QLearner, maze)
 
     # Q decision with 99% greedy strategy
-    demo_greedy = 1
+    demo_greedy = 0.9
     demo_interval = 0.01
     QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy)
     running(50, demo_interval, True, QRunner, demo_maze)

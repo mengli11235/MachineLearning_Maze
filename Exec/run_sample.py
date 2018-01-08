@@ -13,7 +13,7 @@ from MazeEnv.sample_maze import Maze
 from LearningAlgos.sample_maze_RL import QLearningTable
 
 
-def update():
+def update1():
     for episode in range(100):
         # initial observation
         observation = env.reset()
@@ -46,5 +46,5 @@ if __name__ == "__main__":
     env = Maze()
     RL = QLearningTable(actions=list(range(env.n_actions)))
 
-    env.after(1, update)
+    env.after(1, update1)
     env.mainloop()

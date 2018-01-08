@@ -33,8 +33,9 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
     # end of game
     print('game over')
-    env.destroy()
-    # QL.
+    if _is_render:
+        env.destroy()
+    QL.export_tf()
 
 
 if __name__ == "__main__":
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     # set if render the GUI
     is_render = True
     # set number of runs
-    episodes = 1000
+    episodes = 10
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
