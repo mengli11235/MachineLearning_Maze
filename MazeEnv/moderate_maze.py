@@ -18,6 +18,7 @@ class MazeSimulator(tk.Tk, object):
     final_object_list = []
     # ending_con_map = {} #dictionary
     # agent_con_map = {}
+    walls = [];
 
     key_list = []
     chest_list = []
@@ -67,6 +68,17 @@ class MazeSimulator(tk.Tk, object):
                 self.agent_coord[0] - 15, self.agent_coord[1] - 15,
                 self.agent_coord[0] + 15, self.agent_coord[1] + 15,
                 fill='red')
+
+    def set_wall(self, position, reward, is_done):
+        self.walls.append([position, reward, is_done])
+
+        if self.is_render:
+            # draw this object
+            new_obj = self.origin_coord + np.array([self.pixel * position[0], self.pixel * position[1]])
+            self.canvas.create_rectangle(
+                new_obj[0] - 15, new_obj[1] - 15,
+                new_obj[0] + 15, new_obj[1] + 15,
+                fill='black')
 
     def set_fixed_obj(self, position, reward, is_done):
         self.object_list.append([position, reward, is_done])
@@ -153,7 +165,7 @@ class MazeSimulator(tk.Tk, object):
                 fill='red')
             self.set_key_chest([3, 0], [3, 5], 'key', 3)
             for row in walls:
-                self.set_fixed_obj(row, 0, False)
+                self.set_wall(row, 0, False)
             for row in pits:
                 self.set_fixed_obj(row, -1, False)
             for row in exits:
@@ -167,16 +179,16 @@ class MazeSimulator(tk.Tk, object):
         state = self.agent
         new_position = [0, 0]
         if action == 0:   # ^
-            if state[1] > 0:
+            if state[1] > 0 and self.check_no_wall([state[0],  state[1]-1]):
                 new_position[1] = -1
         elif action == 1:   # v
-            if state[1] < (self.grid_height - 1):
+            if state[1] < (self.grid_height - 1) and self.check_no_wall([state[0],  state[1]+1]):
                 new_position[1] = 1
         elif action == 2:   # <
-            if state[0] > 0:
+            if state[0] > 0 and self.check_no_wall([state[0]-1,  state[1]]):
                 new_position[0] = -1
         elif action == 3:   # >
-            if state[0] < (self.grid_width - 1):
+            if state[0] < (self.grid_width - 1) and self.check_no_wall([state[0]+1,  state[1]]):
                 new_position[0] = 1
         # Check if the agent collides with the wall, if so, it harshly dies
         collide_walls = [obj for obj in self.object_list if obj[0][0] == new_position[0] and obj[0][1] == new_position[1] and obj[1] == 0]
@@ -223,6 +235,13 @@ class MazeSimulator(tk.Tk, object):
         if is_done and self.is_render:
             print(self.agent)
         return np.array(self.agent[:]), reward, is_done
+
+    def check_no_wall(self, new_position):
+        found_wall = [obj for obj in self.walls if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]
+        if len(found_wall) > 0:
+            return False
+        else:
+            return True
 
     def check_key_chest(self, new_position):
         found_key = [obj for obj in self.key_list if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]
