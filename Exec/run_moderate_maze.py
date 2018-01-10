@@ -89,7 +89,7 @@ if __name__ == "__main__":
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
-    size_maze = [4, 6]
+    size_maze = [20, 20]
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
