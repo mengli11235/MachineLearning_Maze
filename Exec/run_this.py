@@ -1,5 +1,5 @@
-from moderate_maze import MazeSimulator
-from RL_brain import SarsaLambdaTable
+from MazeEnv.moderate_maze import MazeSimulator
+from LearningAlgos.RL_brain import SarsaLambdaTable
 import time
 
 def learning(epi, time_in_ms, _is_render, RL, env):
