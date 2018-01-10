@@ -215,6 +215,10 @@ class MazeSimulator(tk.Tk, object):
         else:
             reward = self.check_key_chest(self.agent)
             is_done = False
+            # if reward > 0:
+            #     is_done = True
+            # else:
+            #     is_done = False
 
         if is_done and self.is_render:
             print(self.agent)
