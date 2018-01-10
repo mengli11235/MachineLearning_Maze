@@ -42,10 +42,12 @@ class RL(object):
 class SarsaLambdaTable(RL):
     def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, trace_decay=0.9):
         super(SarsaLambdaTable, self).__init__(actions, learning_rate, reward_decay, e_greedy)
-
         # backward view, eligibility trace.
         self.lambda_ = trace_decay
         self.eligibility_trace = self.q_table.copy()
+
+    def set_prior_qtable(self, df_qtable):
+        self.q_table = df_qtable
 
     def check_state_exist(self, state):
         if state not in self.q_table.index:
@@ -60,10 +62,10 @@ class SarsaLambdaTable(RL):
             # also update eligibility trace
             self.eligibility_trace = self.eligibility_trace.append(to_be_append)
 
-    def learn(self, s, a, r, s_, a_, is_done):
+    def learn(self, s, a, r, s_, a_):
         self.check_state_exist(s_)
         q_predict = self.q_table.ix[s, a]
-        if not is_done:
+        if s_ != 'terminal':
             q_target = r + self.gamma * self.q_table.ix[s_, a_]  # next state is not terminal
         else:
             q_target = r  # next state is terminal
