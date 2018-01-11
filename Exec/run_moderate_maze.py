@@ -162,7 +162,7 @@ if __name__ == "__main__":
             learning(episodes, interval, is_render, QLearner, maze)
     else:
         # Q decision with 99% greedy strategy
-        demo_greedy = 1
+        demo_greedy = 0.99
         demo_interval = 0.05
         QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy)
         running(50, demo_interval, True, QRunner, maze)
