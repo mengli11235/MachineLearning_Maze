@@ -266,9 +266,9 @@ class MazeSimulator(tk.Tk, object):
             #     is_done = False
 
         if is_done:
-            print()
-            print("Reward: ", reward)
             if self.is_render:
+                print()
+                print("Reward: ", reward)
                 for obj in self.key_list:
                     self.canvas.delete(obj[3])
                 for obj in self.chest_list:
