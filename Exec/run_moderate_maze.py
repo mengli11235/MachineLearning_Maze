@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # set rewards
     # maze.set_fixed_obj([3, 4], 1, True)
     # demo_maze.set_fixed_obj([3, 4], 1, True)
-    maze.set_key_chest([3,0], [3,5], 'key', 3)
+    maze.set_key_chest([3,0], [11,15], 'key', 3)
 
     # maze.set_fixed_obj([1, 3], 1, True)
     # demo_maze.set_fixed_obj([1, 3], 1, True)
