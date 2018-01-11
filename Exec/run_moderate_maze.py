@@ -78,6 +78,7 @@ def running(epi, time_in_ms, _is_render, QL, env):
     for episode in range(epi):
         # initiate the agent
         agent = env.reset()
+        reward_in_each_epi = 0
 
         while True:
             # fresh env
@@ -88,6 +89,7 @@ def running(epi, time_in_ms, _is_render, QL, env):
 
             # RL take action and get next observation and reward
             new_state, reward, is_done = env.taking_action(action)
+            reward_in_each_epi += reward
 
             # swap observation
             agent = new_state
@@ -95,8 +97,8 @@ def running(epi, time_in_ms, _is_render, QL, env):
             # break while loop when end of this episode
             if is_done:
                 break
-
-
+        if _is_render:
+            print(reward_in_each_epi)
 
     # end of game
     print('game over')
@@ -165,5 +167,5 @@ if __name__ == "__main__":
         demo_greedy = 0.99
         demo_interval = 0.05
         QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy)
-        running(50, demo_interval, True, QRunner, maze)
+        running(30, demo_interval, True, QRunner, maze)
 
