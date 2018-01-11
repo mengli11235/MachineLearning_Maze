@@ -1,5 +1,6 @@
 from MazeEnv.moderate_maze import MazeSimulator
 from LearningAlgos.RL_brain import SarsaLambdaTable
+import matplotlib.pyplot as plt
 import time
 
 def learning(epi, time_in_ms, _is_render, RL, env):
@@ -52,6 +53,10 @@ def learning(epi, time_in_ms, _is_render, RL, env):
     print('time (in sec) spent over epochs:')
     print(time_array)
     env.destroy()
+
+    plt.plot(epo, time_array)
+    plt.title('time for each epoch')
+    plt.show()
 
 if __name__ == "__main__":
     #env = MazeSimulator()
