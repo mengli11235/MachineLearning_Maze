@@ -1,3 +1,4 @@
+
 """
 Reinforcement learning maze
 
@@ -8,7 +9,6 @@ import numpy as np
 import time
 import tkinter as tk
 
-
 class MazeSimulator(tk.Tk, object):
     pixel = 40
     anchor = pixel/2
@@ -18,7 +18,7 @@ class MazeSimulator(tk.Tk, object):
     final_object_list = []
     # ending_con_map = {} #dictionary
     # agent_con_map = {}
-    walls = [];
+    walls = []
 
     key_chest_to_set = []
     key_list = []
@@ -64,7 +64,7 @@ class MazeSimulator(tk.Tk, object):
 
     def _init_grid(self):
         if self.is_render:
-            self.title('easy maze')
+            self.title('moderate maze')
             self.geometry('{0}x{1}'.format(self.grid_width * self.pixel, self.grid_height * self.pixel))
             self.canvas = tk.Canvas(self, bg='white',
                                     height=self.grid_height * self.pixel,
@@ -135,7 +135,8 @@ class MazeSimulator(tk.Tk, object):
 
     def set_key_chest(self, key_position, reward_position, key, reward):
         self.key_chest_to_set.append([key_position, reward_position, key, reward])
-
+        key_coordinates = -1
+        chest_coordinates = -1
 
         if self.is_render:
             # draw this object
@@ -148,8 +149,9 @@ class MazeSimulator(tk.Tk, object):
             chest_coordinates = self.canvas.create_text(
                 chest_obj[0], chest_obj[1],
                 fill='black', text="chest")
-            self.key_list.append([key_position, key, reward, key_coordinates])
-            self.chest_list.append([reward_position, key, 0, chest_coordinates])
+
+        self.key_list.append([key_position, key, reward, key_coordinates])
+        self.chest_list.append([reward_position, key, 0, chest_coordinates])
 
 
     def set_collect_all_rewards(self, reward_position_list, reward, flag_name):
@@ -172,17 +174,10 @@ class MazeSimulator(tk.Tk, object):
         self.key_list = []
         self.chest_list = []
 
-        if self.is_render:
-            self.update()
-            time.sleep(0.5)
-            self.canvas.delete(self.agent_avatar)
-            self.agent_coord = np.array(
-                [self.anchor + (self.pixel * self.agent[0]), self.anchor + (self.pixel * self.agent[1])])
-            self.agent_avatar = self.canvas.create_rectangle(
-                self.agent_coord[0] - 15, self.agent_coord[1] - 15,
-                self.agent_coord[0] + 15, self.agent_coord[1] + 15,
-                fill='red')
-            for [key_position, reward_position, key, reward] in self.key_chest_to_set:
+        for [key_position, reward_position, key, reward] in self.key_chest_to_set:
+            key_coordinates = -1
+            chest_coordinates = -1
+            if self.is_render:
                 key_obj = self.origin_coord + np.array([self.pixel * key_position[0], self.pixel * key_position[1]])
                 key_coordinates = self.canvas.create_text(
                     key_obj[0], key_obj[1],
@@ -193,9 +188,20 @@ class MazeSimulator(tk.Tk, object):
                 chest_coordinates = self.canvas.create_text(
                     chest_obj[0], chest_obj[1],
                     fill='black', text="chest")
-                self.key_list.append([key_position, key, reward, key_coordinates])
-                self.chest_list.append([reward_position, key, 0, chest_coordinates])
 
+            self.key_list.append([key_position, key, reward, key_coordinates])
+            self.chest_list.append([reward_position, key, 0, chest_coordinates])
+
+        if self.is_render:
+            self.update()
+            time.sleep(0.5)
+            self.canvas.delete(self.agent_avatar)
+            self.agent_coord = np.array(
+                [self.anchor + (self.pixel * self.agent[0]), self.anchor + (self.pixel * self.agent[1])])
+            self.agent_avatar = self.canvas.create_rectangle(
+                self.agent_coord[0] - 15, self.agent_coord[1] - 15,
+                self.agent_coord[0] + 15, self.agent_coord[1] + 15,
+                fill='red')
 
         # return position of agent
         return np.array(self.agent[:])
@@ -252,17 +258,20 @@ class MazeSimulator(tk.Tk, object):
         else:
             reward = self.check_key_chest(self.agent)
             is_done = False
+
             # if reward > 0:
             #     is_done = True
             # else:
             #     is_done = False
 
-        if is_done and self.is_render:
-            print(self.agent)
-            for obj in self.key_list:
-                self.canvas.delete(obj[3])
-            for obj in self.chest_list:
-                self.canvas.delete(obj[3])
+        if is_done:
+            print()
+            print("Reward: ", reward)
+            if self.is_render:
+                for obj in self.key_list:
+                    self.canvas.delete(obj[3])
+                for obj in self.chest_list:
+                    self.canvas.delete(obj[3])
         return np.array(self.agent[:]), reward, is_done
 
     def check_no_wall(self, new_position):
@@ -283,7 +292,8 @@ class MazeSimulator(tk.Tk, object):
                         if obj[1] == key_obj[1]:
                             obj[2] = key_obj[2]
                     self.key_list.remove(key_obj)
-                    self.canvas.delete(key_obj[3])
+                    if key_obj[3] > -1:
+                        self.canvas.delete(key_obj[3])
         else:
             found_chest = [obj for obj in self.chest_list if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]
             if len(found_chest) > 0:
@@ -292,7 +302,8 @@ class MazeSimulator(tk.Tk, object):
                     if chest_key in self.agent_keys:
                         checked_reward = chest[2]
                         self.chest_list.remove(chest)
-                        self.canvas.delete(chest[3])
+                        if chest[3] > -1:
+                            self.canvas.delete(chest[3])
         return checked_reward
 
     def render(self, time_in_ms):

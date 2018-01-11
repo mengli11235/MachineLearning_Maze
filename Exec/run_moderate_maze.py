@@ -5,13 +5,21 @@
 from MazeEnv.moderate_maze import MazeSimulator
 from LearningAlgos.moderate_maze_RL import QLearningTable
 import pandas as pd
+import matplotlib.pyplot as plt
 import time
 
 
+
 def learning(epi, time_in_ms, _is_render, QL, env):
+    rewards = []
+    time_array = []
+    epo = []
+
     for episode in range(epi):
         # initiate the agent
         agent = env.reset()
+        reward_in_each_epi = 0
+        init_time = time.time()
 
         while True:
             # fresh env
@@ -23,6 +31,8 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
             # RL take action and get next observation and reward
             new_state, reward, is_done = env.taking_action(action)
+            reward_in_each_epi += reward
+
 
             # RL learn from this transition
             QL.learn(current_state, action, reward, str(new_state), is_done)
@@ -33,7 +43,14 @@ def learning(epi, time_in_ms, _is_render, QL, env):
             # break while loop when end of this episode
             if is_done:
                 print(episode/epi)
+                rewards.append(reward_in_each_epi)
+                print(rewards)
+                time_array.append(format(time.time() - init_time, '.2f'))
+                print(time_array)
+                epo.append(episode+1)
+                print(epo)
                 break
+
 
     # end of game
     print('game over')
@@ -43,6 +60,11 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
     QL.q_table.to_csv("temp_q_table.csv", sep=',', encoding='utf-8')
     print(QL.q_table)
+    plt.plot(epo, time_array)
+    plt.show()
+
+    # plt.plot(epo, rewards)
+    # plt.show()
 
 
 def running(epi, time_in_ms, _is_render, QL, env):
@@ -74,6 +96,8 @@ def running(epi, time_in_ms, _is_render, QL, env):
             if is_done:
                 break
 
+
+
     # end of game
     print('game over')
     if _is_render:
@@ -83,9 +107,9 @@ def running(epi, time_in_ms, _is_render, QL, env):
 
 if __name__ == "__main__":
     # set if render the GUI
-    is_render = True
+    is_render = False
     # set number of runs
-    episodes = 1000
+    episodes = 5
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -102,7 +126,7 @@ if __name__ == "__main__":
     # set rewards
     # maze.set_fixed_obj([3, 4], 1, True)
     # demo_maze.set_fixed_obj([3, 4], 1, True)
-    maze.set_key_chest([3,0], [11,15], 'key', 3)
+    maze.set_key_chest([1,0], [11,15], 'key', 3)
 
     # maze.set_fixed_obj([1, 3], 1, True)
     # demo_maze.set_fixed_obj([1, 3], 1, True)
@@ -117,7 +141,7 @@ if __name__ == "__main__":
 
     # build the rendered maze
     maze.build_maze()
-    demo_maze.build_maze()
+    # demo_maze.build_maze()
 
     # initiate QLearner
     actions = list(range(maze.n_actions))
