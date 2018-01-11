@@ -42,13 +42,14 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
             # break while loop when end of this episode
             if is_done:
-                # print(episode/epi)
                 rewards.append(reward_in_each_epi)
-                # print(rewards)
                 time_array.append(format(time.time() - init_time, '.2f'))
                 # print(time_array)
                 epo.append(episode+1)
-                # print(epo)
+                if _is_render:
+                    print(episode/epi)
+                    print(rewards)
+                    print(epo)
                 break
 
 
@@ -112,7 +113,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 500
+    episodes = 300
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -152,7 +153,7 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.8
-    greedy = 0.85
+    greedy = 0.8
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
 
     # run the simulation of training
