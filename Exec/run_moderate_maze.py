@@ -42,13 +42,13 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
             # break while loop when end of this episode
             if is_done:
-                print(episode/epi)
+                # print(episode/epi)
                 rewards.append(reward_in_each_epi)
-                print(rewards)
+                # print(rewards)
                 time_array.append(format(time.time() - init_time, '.2f'))
-                print(time_array)
+                # print(time_array)
                 epo.append(episode+1)
-                print(epo)
+                # print(epo)
                 break
 
 
@@ -108,8 +108,9 @@ def running(epi, time_in_ms, _is_render, QL, env):
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
+    is_demo = False
     # set number of runs
-    episodes = 5
+    episodes = 500
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -119,8 +120,10 @@ if __name__ == "__main__":
     init_pos = [0, 0]
 
     # initiate maze simulator for learning and running
+    if is_demo:
+        is_render = True
     maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
-    demo_maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, True)
+    # demo_maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, True)
 
     # set fixed object ([column, row], reward, isFinishedWhenReach)
     # set rewards
@@ -135,9 +138,9 @@ if __name__ == "__main__":
 
     # set traps
     # maze.set_fixed_obj([1, 2], -1, True)
-    demo_maze.set_fixed_obj([1, 2], -1, True)
+    # demo_maze.set_fixed_obj([1, 2], -1, True)
     # maze.set_fixed_obj([2, 1], -1, True)
-    demo_maze.set_fixed_obj([2, 1], -1, True)
+    # demo_maze.set_fixed_obj([2, 1], -1, True)
 
     # build the rendered maze
     maze.build_maze()
@@ -151,15 +154,16 @@ if __name__ == "__main__":
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
 
     # run the simulation of training
-    if is_render:
-        maze.after(1, learning(episodes, interval, is_render, QLearner, maze))
-        maze.mainloop()
+    if not is_demo:
+        if is_render:
+            maze.after(1, learning(episodes, interval, is_render, QLearner, maze))
+            maze.mainloop()
+        else:
+            learning(episodes, interval, is_render, QLearner, maze)
     else:
-        learning(episodes, interval, is_render, QLearner, maze)
-
-    # Q decision with 99% greedy strategy
-    # demo_greedy = 1
-    # demo_interval = 0.01
-    # QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy)
-    # running(50, demo_interval, True, QRunner, demo_maze)
+        # Q decision with 99% greedy strategy
+        demo_greedy = 1
+        demo_interval = 0.05
+        QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy)
+        running(50, demo_interval, True, QRunner, maze)
 

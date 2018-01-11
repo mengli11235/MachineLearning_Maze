@@ -52,15 +52,16 @@ class MazeSimulator(tk.Tk, object):
 
         self._init_grid()
         self.set_agent()
+        for row in walls:
+            self.set_wall(row, 0, False)
+        for row in pits:
+            self.set_fixed_obj(row, -1, False)
+        for row in exits:
+            # You might need to change set_fixed_obj() function if you change the reward for exit
+            self.set_fixed_obj(row, 30, True)
+
         if self.is_render:
             self.update()
-            for row in walls:
-                self.set_wall(row, 0, False)
-            for row in pits:
-                self.set_fixed_obj(row, -1, False)
-            for row in exits:
-                # You might need to change set_fixed_obj() function if you change the reward for exit
-                self.set_fixed_obj(row, 30, True)
 
     def _init_grid(self):
         if self.is_render:
