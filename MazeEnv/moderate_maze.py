@@ -56,9 +56,9 @@ class MazeSimulator(tk.Tk, object):
             self.set_wall(row, 0, False)
         for row in pits:
             self.set_fixed_obj(row, -1, False)
-        for row in exits:
-            # You might need to change set_fixed_obj() function if you change the reward for exit
-            self.set_fixed_obj(row, 30, True)
+        # for row in exits:
+        #     # You might need to change set_fixed_obj() function if you change the reward for exit
+        #     self.set_fixed_obj(row, 30, True)
 
         if self.is_render:
             self.update()
@@ -136,23 +136,6 @@ class MazeSimulator(tk.Tk, object):
 
     def set_key_chest(self, key_position, reward_position, key, reward):
         self.key_chest_to_set.append([key_position, reward_position, key, reward])
-        key_coordinates = -1
-        chest_coordinates = -1
-
-        if self.is_render:
-            # draw this object
-            key_obj = self.origin_coord + np.array([self.pixel * key_position[0], self.pixel * key_position[1]])
-            key_coordinates = self.canvas.create_text(
-                key_obj[0], key_obj[1],
-                fill='black', text="key")
-
-            chest_obj = self.origin_coord + np.array([self.pixel * reward_position[0], self.pixel * reward_position[1]])
-            chest_coordinates = self.canvas.create_text(
-                chest_obj[0], chest_obj[1],
-                fill='black', text="chest")
-
-        self.key_list.append([key_position, key, reward, key_coordinates])
-        self.chest_list.append([reward_position, key, 0, chest_coordinates])
 
 
     def set_collect_all_rewards(self, reward_position_list, reward, flag_name):
@@ -204,8 +187,8 @@ class MazeSimulator(tk.Tk, object):
                 self.agent_coord[0] + 15, self.agent_coord[1] + 15,
                 fill='red')
 
-        # return position of agent
-        return np.array(self.agent[:])
+        # return position of agent and has keys or not
+        return np.array([self.agent[0], self.agent[1], len(self.agent_keys)])
 
     def taking_action(self, action):
         state = self.agent
@@ -257,8 +240,8 @@ class MazeSimulator(tk.Tk, object):
             # else:
             #    is_done = is_done_content
         else:
-            reward = self.check_key_chest(self.agent)
-            is_done = False
+            is_done, reward = self.check_key_chest(self.agent)
+            # is_done = False
 
             # if reward > 0:
             #     is_done = True
@@ -273,7 +256,7 @@ class MazeSimulator(tk.Tk, object):
                     self.canvas.delete(obj[3])
                 for obj in self.chest_list:
                     self.canvas.delete(obj[3])
-        return np.array(self.agent[:]), reward, is_done
+        return np.array([self.agent[0], self.agent[1], len(self.agent_keys)]), reward-0.01, is_done
 
     def check_no_wall(self, new_position):
         found_wall = [obj for obj in self.walls if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]
@@ -283,6 +266,7 @@ class MazeSimulator(tk.Tk, object):
             return True
 
     def check_key_chest(self, new_position):
+        is_done = False
         found_key = [obj for obj in self.key_list if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]
         checked_reward = 0
         if len(found_key) > 0:
@@ -305,7 +289,8 @@ class MazeSimulator(tk.Tk, object):
                         self.chest_list.remove(chest)
                         if chest[3] > -1:
                             self.canvas.delete(chest[3])
-        return checked_reward
+                        is_done = True
+        return is_done, checked_reward
 
     def render(self, time_in_ms):
         if self.is_render:
