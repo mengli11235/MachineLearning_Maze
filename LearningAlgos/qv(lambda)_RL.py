@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 
-class QV:
+class VTable:
     
-    def __init__(self, actions, reward_decay, e_greedy, learning_rate, alphaW=.1, alphaV=.1, beta=2):
+    def __init__(self, actions, reward_decay, alphaW=.1, alphaV=.1, beta=2):
 
         self.actions = actions
         #self.v = np.random.randint(5, size=(world.n, world.m))
@@ -11,10 +11,7 @@ class QV:
         self.alphaW = alphaW                    # learning rate for w
         self.alphaV = alphaV                    # learning rate for v
         self.beta = beta
-        self.lr = learning_rate
         self.gamma = reward_decay
-        self.epsilon = e_greedy
-        self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
         self.w = np.zeros(self.q_table.shape[0])              # vector of conditioned reinforcement values, one for each state
         
     def probabilities(self, states):
@@ -23,16 +20,8 @@ class QV:
             initial = np.array((self.v[s, :] * self.beta))
             vexp = np.exp(initial) # vector of exponents
             vexp = vexp/sum(vexp)
-            #print("p:")
-            #print(p)
-            #print("vexp:")
-            #print(vexp)
             p[s] = vexp
-            #print("final p:")
-            #print (p)
-            #p = np.concatenate(((p,vexp)), axis=0)
-            #np.vstack((p,vexp))
-            #p = np.append(p, vexp)
+
         return p
     
     def action(self, states, state):
@@ -47,6 +36,15 @@ class QV:
         deltaV = self.alphaV * (totreward - self.v[fromState, action])
         self.v[fromState, action] += deltaV
         return self
+
+class QTable:
+
+    def __init__(self, actions, learning_rate, reward_decay, e_greedy):
+        self.actions = actions  # a list
+        self.lr = learning_rate
+        self.gamma = reward_decay
+        self.epsilon = e_greedy
+        self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
 
     def set_prior_qtable(self, df_qtable):
         self.q_table = df_qtable
@@ -83,7 +81,3 @@ class QV:
                     index=self.q_table.columns,
                     name=state,
                 )
-            self.w=np.append(self.w,0)
-    
-    
-    
