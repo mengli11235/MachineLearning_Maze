@@ -5,6 +5,8 @@
 from MazeEnv.moderate_maze import MazeSimulator
 from LearningAlgos.moderate_maze_RL import QLearningTable
 import pandas as pd
+import matplotlib as mpl
+mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 import time
 
