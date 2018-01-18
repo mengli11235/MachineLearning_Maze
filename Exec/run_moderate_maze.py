@@ -108,7 +108,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 500
+    episodes = 10
     # animation interval
     interval = 0.005
     # set the size of maze: column x row

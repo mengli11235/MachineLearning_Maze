@@ -1,15 +1,21 @@
+"""
+
+"""
+
 from MazeEnv.moderate_maze import MazeSimulator
 from LearningAlgos.RL_brain import SarsaLambdaTable
-import matplotlib.pyplot as plt
+import matplotlib as plt
 import time
 
+
 def learning(epi, time_in_ms, _is_render, RL, env):
-    step = 0
     rewards = []
     time_array = []
+    epo = []
+
     for episode in range(epi):
         # initial observation
-        observation = env.reset()
+        # observation = env.reset()
         reward_in_epoch = 0
         init_time = time.time()
 
@@ -44,15 +50,15 @@ def learning(epi, time_in_ms, _is_render, RL, env):
             if done:
                 rewards.append(reward_in_epoch)
                 time_array.append(format(time.time()-init_time, '.2f'))
+                epo.append(episode + 1)
                 break
-            step += 1
 
     # end of game
     print('game over, total rewards gained for each epoch:')
     print(rewards)
     print('time (in sec) spent over epochs:')
     print(time_array)
-    env.destroy()
+    # env.destroy()
 
     plt.plot(epo, time_array)
     plt.title('time for each epoch')
