@@ -17,6 +17,15 @@ class QLearningTable:
     def set_prior_qtable(self, df_qtable):
         self.q_table = df_qtable
 
+    def set_greedy_rule(self, epoch_to_update, greedy_rate):
+        self.epoch_to_update = epoch_to_update
+        self.greedy_rate = greedy_rate
+
+    def update_episode(self, episode):
+        if episode != 0 and episode % self.epoch_to_update == 0:
+            self.epsilon = 1 - (1 - self.epsilon)*self.greedy_rate
+            # print(self.epsilon)
+
     def choose_action(self, observation):
         # print()
         self.check_state_exist(observation)
