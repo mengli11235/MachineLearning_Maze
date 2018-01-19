@@ -148,7 +148,7 @@ if __name__ == "__main__":
     reward_gamma = 0.95
     greedy = 0.7
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
-    QLearner.set_greedy_rule(50, 0.95)
+    QLearner.set_greedy_rule(20, 0.9)
 
     # run the simulation of training
     if not is_demo:

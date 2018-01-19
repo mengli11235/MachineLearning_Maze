@@ -60,23 +60,20 @@ class QLearningTable:
         return int(action)
 
     def learn(self, _s, a, r, _s_, is_done):
-        extra_state = str(_s[2:4])
-        is_virtual_done = False
+        extra_state = str(_s_[2:4])
         if extra_state != self.agent_extra_state:
             # future extra_state not [0, 0]
             if not(_s_[2] == 0 and _s_[3] == 0):
-                is_virtual_done = True
+                is_done = True
             self.agent_extra_state = extra_state
             self.update_episode(extra_state)
+
         s = str(_s)
         s_ = str(_s_)
         self.check_state_exist(s_)
         q_predict = self.q_table.ix[s, a]
         if not is_done:
-            if is_virtual_done:
-                q_target = r  # next state is like new maze
-            else:
-                q_target = r + self.gamma * self.q_table.ix[s_, :].max()  # next state is not terminal
+            q_target = r + self.gamma * self.q_table.ix[s_, :].max()  # next state is not terminal
         else:
             q_target = r  # next state is terminal
         self.q_table.ix[s, a] += self.lr * (q_target - q_predict)  # update
