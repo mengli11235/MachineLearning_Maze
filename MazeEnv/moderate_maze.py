@@ -314,7 +314,7 @@ class MazeSimulator(tk.Tk, object):
                         self.chest_list.remove(chest)
                         if chest[3] > -1:
                             self.canvas.delete(chest[3])
-                        is_done = True
+                        is_done = False
         return is_done, checked_reward
 
     def render(self, time_in_ms):
