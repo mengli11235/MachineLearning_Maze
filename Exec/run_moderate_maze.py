@@ -62,7 +62,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
     QL.q_table.to_csv("temp_q_table.csv", sep=',', encoding='utf-8')
     print(QL.q_table)
-    plt.plot(epo, time_array)
+    plt.plot(epo, rewards)
     plt.show()
 
     # plt.plot(epo, rewards)
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.95
-    greedy = 0.8
+    greedy = 0.85
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
     QLearner.set_greedy_rule(20, 0.9)
 
