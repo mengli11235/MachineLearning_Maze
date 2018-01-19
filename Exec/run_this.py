@@ -60,7 +60,7 @@ def learning(epi, time_in_ms, _is_render, RL, env):
     if is_render:
         env.destroy()
 
-    plt.plot(epo, time_array)
+    plt.plot(epo, rewards)
     plt.show()
 
 
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     #env = MazeSimulator()
     # set if render the GUI
     is_render = False
-    is_demo = True
+    is_demo = False
     # set number of runs
     episodes = 300
     # animation interval
@@ -148,14 +148,16 @@ if __name__ == "__main__":
     if is_demo:
         is_render = True
     maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
+    maze.set_key_chest([1, 0], [11, 15], 'key', 1500)
+    maze.set_step_penalty(-1)
 
     # build the rendered maze
     maze.build_maze()
 
     # initiate SarsaLearner
     actions = list(range(maze.n_actions))
-    learning_rate = 0.01
-    reward_gamma = 0.9
+    learning_rate = 0.1
+    reward_gamma = 0.95
     greedy = 0.7
     SLearner = SarsaLambdaTable(actions, 
                                 learning_rate, 

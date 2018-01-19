@@ -1,13 +1,8 @@
-"""
-
-"""
-
 from MazeEnv.moderate_maze import MazeSimulator
 from LearningAlgos.moderate_maze_RL import QLearningTable
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
-
 
 
 def learning(epi, time_in_ms, _is_render, QL, env):
@@ -20,23 +15,20 @@ def learning(epi, time_in_ms, _is_render, QL, env):
         agent = env.reset()
         reward_in_each_epi = 0
         init_time = time.time()
-        QL.update_episode(episode)
 
         while True:
             # fresh env
             env.render(time_in_ms)
 
             # RL choose action based on observation
-            current_state = str(agent)
-            action = QL.choose_action(current_state)
+            action = QL.choose_action(agent)
 
             # RL take action and get next observation and reward
             new_state, reward, is_done = env.taking_action(action)
             reward_in_each_epi += reward
 
-
             # RL learn from this transition
-            QL.learn(current_state, action, reward, str(new_state), is_done)
+            QL.learn(agent, action, reward, new_state, is_done)
 
             # swap observation
             agent = new_state
@@ -52,7 +44,6 @@ def learning(epi, time_in_ms, _is_render, QL, env):
                     print(rewards)
                     print(epo)
                 break
-
 
     # end of game
     print('game over')
@@ -112,9 +103,9 @@ def running(epi, time_in_ms, _is_render, QL, env):
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
-    is_demo = True
+    is_demo = False
     # set number of runs
-    episodes = 300
+    episodes = 1200
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -128,12 +119,13 @@ if __name__ == "__main__":
         is_render = True
     maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
     # demo_maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, True)
+    maze.set_step_penalty(-1)
 
     # set fixed object ([column, row], reward, isFinishedWhenReach)
     # set rewards
     # maze.set_fixed_obj([3, 4], 1, True)
     # demo_maze.set_fixed_obj([3, 4], 1, True)
-    maze.set_key_chest([1,0], [11,15], 'key', 30)
+    maze.set_key_chest([10, 16], [9, 4], 'key', 800, 5000)
 
     # maze.set_fixed_obj([1, 3], 1, True)
     # demo_maze.set_fixed_obj([1, 3], 1, True)
@@ -154,9 +146,9 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.95
-    greedy = 0.85
+    greedy = 0.7
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
-    QLearner.set_greedy_rule(20, 0.9)
+    QLearner.set_greedy_rule(50, 0.95)
 
     # run the simulation of training
     if not is_demo:

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+
 class VTable:
     
     def __init__(self, actions, reward_decay, alphaW=.1, alphaV=.1, beta=2):
@@ -37,8 +38,8 @@ class VTable:
         self.v[fromState, action] += deltaV
         return self
 
-class QTable:
 
+class QTable:
     def __init__(self, actions, learning_rate, reward_decay, e_greedy):
         self.actions = actions  # a list
         self.lr = learning_rate
@@ -80,4 +81,4 @@ class QTable:
                     [0]*len(self.actions),
                     index=self.q_table.columns,
                     name=state,
-                )
+                ))
