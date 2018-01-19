@@ -16,29 +16,36 @@ class QLearningTable:
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
         self.greedy_dict = {}
         self.agent_extra_state = ""
+        self.decay_count = 0
 
     def set_prior_qtable(self, df_qtable):
         self.q_table = df_qtable
 
-    def set_greedy_rule(self, epoch_to_update, greedy_rate):
+    def set_greedy_rule(self, epoch_to_update, greedy_rate, max_greedy):
         self.epoch_to_update = epoch_to_update
         self.greedy_rate = greedy_rate
+        self.max_greedy = max_greedy
 
     def update_episode(self, key):
         if key not in self.greedy_dict:
-            self.greedy_dict[key] = [1, self.global_e_greedy]
+            self.greedy_dict[key] = [1, self.global_e_greedy, self.epoch_to_update[self.decay_count], self.greedy_rate[self.decay_count]]
+            self.decay_count = self.decay_count + 1
         else:
             obj = self.greedy_dict[key]
             epi = obj[0] + 1
             epsilon = obj[1]
-            if epi != 0 and epi % self.epoch_to_update == 0:
+            epoch_update = obj[2]
+            if epi != 0 and epi % epoch_update == 0 and epsilon != self.max_greedy:
+                greedy_rate = obj[3]
+                epsilon = 1 - (1 - epsilon) * greedy_rate
+                epsilon = self.max_greedy if epsilon > self.max_greedy else epsilon
                 print(key)
                 print(epi)
                 print(epsilon)
                 print()
-                epsilon = 1 - (1 - epsilon) * self.greedy_rate
                 # print(epsilon)
-            self.greedy_dict[key] = [epi, epsilon]
+            self.greedy_dict[key][0] = epi
+            self.greedy_dict[key][1] = epsilon
 
     def choose_action(self, state):
         extra_state = str(state[2:4])

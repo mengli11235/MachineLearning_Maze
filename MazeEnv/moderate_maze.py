@@ -225,11 +225,11 @@ class MazeSimulator(tk.Tk, object):
         collide_walls = [obj for obj in self.walls if (obj[0][0] == new_state[0] and obj[0][1] == new_state[1] and obj[1] == 0)]
         if len(collide_walls) > 0:
             new_state = np.array([self.agent[0], self.agent[1], len(self.agent_keys), len(self.agent_chests)])
-            return new_state, -10, False
+            return new_state, -3, False
 
         if has_hit_border:
             new_state = np.array([self.agent[0], self.agent[1], len(self.agent_keys), len(self.agent_chests)])
-            return new_state, self.step_penalty*2, False
+            return new_state, self.step_penalty*3, False
 
         if self.is_render:
             self.canvas.move(self.agent_avatar, new_position[0] * self.pixel, new_position[1] * self.pixel)  # move agent
