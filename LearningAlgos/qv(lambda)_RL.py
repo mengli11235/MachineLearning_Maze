@@ -40,7 +40,6 @@ class VTable:
 
 
 class QTable:
-
     def __init__(self, actions, learning_rate, reward_decay, e_greedy):
         self.actions = actions  # a list
         self.lr = learning_rate
