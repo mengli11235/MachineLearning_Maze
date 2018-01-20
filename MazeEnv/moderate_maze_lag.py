@@ -155,6 +155,11 @@ class MazeSimulator(tk.Tk, object):
         self.agent_con_map = {}
         self.object_list = self.final_object_list[:]
         self.agent_keys = []
+        if self.is_render:
+            for obj in self.key_list:
+                self.canvas.delete(obj[3])
+            for obj in self.chest_list:
+                self.canvas.delete(obj[3])
         self.key_list = []
         self.chest_list = []
 
