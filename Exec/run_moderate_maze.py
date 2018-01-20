@@ -14,7 +14,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
     for episode in range(epi):
         # initiate the agent
-        agent = env.reset()
+        agent, cond = env.reset()
         reward_in_each_epi = 0
         init_time = time.time()
         step = 0
@@ -24,17 +24,18 @@ def learning(epi, time_in_ms, _is_render, QL, env):
             env.render(time_in_ms)
 
             # RL choose action based on observation
-            action = QL.choose_action(agent)
+            action = QL.choose_action(agent, cond)
 
             # RL take action and get next observation and reward
-            new_state, reward, is_done = env.taking_action(action)
+            new_state, new_cond, reward, is_done = env.taking_action(action)
             reward_in_each_epi += reward
 
             # RL learn from this transition
-            QL.learn(agent, action, reward, new_state, is_done)
+            QL.learn(agent, cond, action, reward, new_state, new_cond, is_done)
 
             # swap observation
             agent = new_state
+            cond = new_cond
 
             # count step
             step = step + 1
@@ -92,7 +93,7 @@ def running(epi, time_in_ms, _is_render, QL, env):
 
     for episode in range(epi):
         # initiate the agent
-        agent = env.reset()
+        agent, cond = env.reset()
         reward_in_each_epi = 0
 
         while True:
@@ -100,14 +101,15 @@ def running(epi, time_in_ms, _is_render, QL, env):
             env.render(time_in_ms)
 
             # RL choose action based on observation
-            action = QL.choose_action(agent)
+            action = QL.choose_action(agent, cond)
 
             # RL take action and get next observation and reward
-            new_state, reward, is_done = env.taking_action(action)
+            new_state, new_cond, reward, is_done = env.taking_action(action)
             reward_in_each_epi += reward
 
             # swap observation
             agent = new_state
+            cond = new_cond
 
             # break while loop when end of this episode
             if is_done:
@@ -128,7 +130,7 @@ if __name__ == "__main__":
     is_demo = False
 
     # set number of runs
-    episodes = 1200
+    episodes = 600
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -150,6 +152,7 @@ if __name__ == "__main__":
     # maze.set_fixed_obj([3, 4], 1, True)
     # demo_maze.set_fixed_obj([3, 4], 1, True)
     maze.set_key_chest([19, 19], [0, 0], 'key', 0, 600)
+    # maze.set_key_chest([3, 3], [18, 18], 'key2', 0, 800)
     # maze.set_fixed_obj([17, 15], 800, True)
 
     # maze.set_fixed_obj([1, 3], 1, True)
@@ -173,7 +176,7 @@ if __name__ == "__main__":
     reward_gamma = 0.95
     greedy = 0.3
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
-    QLearner.set_greedy_rule([0.9, 0.9, 0.7], episodes, 0.95)
+    QLearner.set_greedy_rule([0.9], episodes, 0.95)
 
     # run the simulation of training
     if not is_demo:

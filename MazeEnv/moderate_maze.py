@@ -194,7 +194,7 @@ class MazeSimulator(tk.Tk, object):
                 fill='red')
 
         # return position of agent and has keys or not
-        return np.array([self.agent[0], self.agent[1], len(self.agent_keys), len(self.agent_chests)])
+        return np.array([self.agent[0], self.agent[1]]), self.print_list(self.agent_keys) + "_" + self.print_list(self.agent_chests)
 
     def taking_action(self, action):
         state = self.agent
@@ -224,12 +224,14 @@ class MazeSimulator(tk.Tk, object):
         # Check if the agent collides with the wall, if so, it harshly dies
         collide_walls = [obj for obj in self.walls if (obj[0][0] == new_state[0] and obj[0][1] == new_state[1] and obj[1] == 0)]
         if len(collide_walls) > 0:
-            new_state = np.array([self.agent[0], self.agent[1], len(self.agent_keys), len(self.agent_chests)])
-            return new_state, -3, False
+            new_state = np.array([self.agent[0], self.agent[1]])
+            new_condition = self.print_list(self.agent_keys) + "_" + self.print_list(self.agent_chests)
+            return new_state, new_condition, -3, False
 
         if has_hit_border:
-            new_state = np.array([self.agent[0], self.agent[1], len(self.agent_keys), len(self.agent_chests)])
-            return new_state, self.step_penalty*3, False
+            new_state = np.array([self.agent[0], self.agent[1]])
+            new_condition = self.print_list(self.agent_keys) + "_" + self.print_list(self.agent_chests)
+            return new_state, new_condition, self.step_penalty*3, False
 
         if self.is_render:
             self.canvas.move(self.agent_avatar, new_position[0] * self.pixel, new_position[1] * self.pixel)  # move agent
@@ -284,8 +286,17 @@ class MazeSimulator(tk.Tk, object):
                     self.canvas.delete(obj[4])
                 for obj in self.chest_list:
                     self.canvas.delete(obj[3])
-        new_state = np.array([self.agent[0], self.agent[1], len(self.agent_keys), len(self.agent_chests)])
-        return new_state, reward, is_done
+        new_state = np.array([self.agent[0], self.agent[1]])
+        new_condition = self.print_list(self.agent_keys) + "_" + self.print_list(self.agent_chests)
+        return new_state, new_condition, reward, is_done
+
+    def print_list(self, ls):
+        str_val = ""
+        if len(ls) == 0:
+            return "[]"
+        for obj in ls:
+            str_val += obj
+        return str_val
 
     def check_no_wall(self, new_position):
         found_wall = [obj for obj in self.walls if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]

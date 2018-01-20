@@ -32,7 +32,8 @@ class QLearningTable:
     def update_episode(self, key):
         if key not in self.greedy_dict:
             self.greedy_dict[key] = [1, self.global_e_greedy, self.epoch_to_update[self.decay_count], self.greedy_rate[self.decay_count]]
-            self.decay_count = self.decay_count + 1
+            if len(self.epoch_to_update) > self.decay_count + 1:
+                self.decay_count = self.decay_count + 1
         else:
             obj = self.greedy_dict[key]
             epi = obj[0] + 1
@@ -50,10 +51,9 @@ class QLearningTable:
             self.greedy_dict[key][0] = epi
             self.greedy_dict[key][1] = epsilon
 
-    def choose_action(self, state):
-        extra_state = str(state[2:4])
+    def choose_action(self, state, extra_state):
         # print()
-        observation = str(state[0:2])
+        observation = str(state)
         self.check_state_exist(extra_state, observation)
         epsilon = self.global_e_greedy
         if extra_state in self.greedy_dict:
@@ -69,21 +69,19 @@ class QLearningTable:
             action = np.random.choice(self.actions)
         return int(action)
 
-    def learn(self, _s, a, r, _s_, is_done):
+    def learn(self, _s, extra_s, a, r, _s_, extra_state, is_done):
         reward_coefficient = 1
-        extra_s = str(_s[2:4])
-        extra_state = str(_s_[2:4])
         virtual_done = False
         if is_done:
             self.agent_extra_state = ""
         elif extra_state != self.agent_extra_state:
-            if not(_s_[2] == 0 and _s_[3] == 0):
+            if extra_state != '[]_[]':
                 virtual_done = True
             self.update_episode(extra_state)
             self.agent_extra_state = extra_state
 
-        s = str(_s[0:2])
-        s_ = str(_s_[0:2])
+        s = str(_s)
+        s_ = str(_s_)
         self.check_state_exist(extra_state, s_)
         q_predict = self.q_table_category[extra_s].ix[s, a]
         if virtual_done:
@@ -142,3 +140,11 @@ class QLearningTable:
                     )
                 )
                 self.q_table_category[extra_state] = q_table
+
+    def print_list(self, ls):
+        str_val = ""
+        if len(ls) == 0:
+            return "[]"
+        for obj in ls:
+            str_val += obj
+        return str_val
