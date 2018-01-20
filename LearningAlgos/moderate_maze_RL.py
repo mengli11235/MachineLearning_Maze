@@ -1,10 +1,6 @@
-"""
-
-"""
-
 import numpy as np
 import pandas as pd
-
+import math
 
 class QLearningTable:
 
@@ -13,16 +9,22 @@ class QLearningTable:
         self.lr = learning_rate
         self.gamma = reward_decay
         self.global_e_greedy = e_greedy
-        self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
+        self.q_table_category = {}
         self.greedy_dict = {}
         self.agent_extra_state = ""
         self.decay_count = 0
 
-    def set_prior_qtable(self, df_qtable):
-        self.q_table = df_qtable
+    def set_prior_qtable(self, key, df_qtable):
+        self.q_table_category[key] = df_qtable
 
-    def set_greedy_rule(self, epoch_to_update, greedy_rate, max_greedy):
-        self.epoch_to_update = epoch_to_update
+    def set_greedy_rule(self, greedy_rate, episode, max_greedy):
+        base = 1 - self.global_e_greedy
+        target = 1 - max_greedy
+        self.epoch_to_update = []
+        for ind_greedy in greedy_rate:
+            rounds =  math.ceil(math.log(target / base, ind_greedy))
+            epos = math.floor(episode/rounds)
+            self.epoch_to_update.append(epos)
         self.greedy_rate = greedy_rate
         self.max_greedy = max_greedy
 
@@ -50,15 +52,15 @@ class QLearningTable:
     def choose_action(self, state):
         extra_state = str(state[2:4])
         # print()
-        observation = str(state)
-        self.check_state_exist(observation)
+        observation = str(state[0:2])
+        self.check_state_exist(extra_state, observation)
         epsilon = self.global_e_greedy
         if extra_state in self.greedy_dict:
             epsilon = self.greedy_dict[extra_state][1]
         # action selection
         if np.random.uniform() < epsilon:
             # choose best action
-            state_action = self.q_table.ix[observation, :]
+            state_action = self.q_table_category[extra_state].ix[observation, :]
             state_action = state_action.reindex(np.random.permutation(state_action.index))     # some actions have same value
             action = state_action.idxmax()
         else:
@@ -76,23 +78,37 @@ class QLearningTable:
             self.agent_extra_state = extra_state
             self.update_episode(extra_state)
 
-        s = str(_s)
-        s_ = str(_s_)
-        self.check_state_exist(s_)
-        q_predict = self.q_table.ix[s, a]
+        extra_s = str(_s[2:4])
+        s = str(_s[0:2])
+        s_ = str(_s_[0:2])
+        self.check_state_exist(extra_state, s_)
+        q_predict = self.q_table_category[extra_s].ix[s, a]
         if not is_done:
-            q_target = r + self.gamma * self.q_table.ix[s_, :].max()  # next state is not terminal
+            q_target = r + self.gamma * self.q_table_category[extra_state].ix[s_, :].max()  # next state is not terminal
         else:
             q_target = r  # next state is terminal
-        self.q_table.ix[s, a] += self.lr * (q_target - q_predict)  # update
+        self.q_table_category[extra_s].ix[s, a] += self.lr * (q_target - q_predict)  # update
 
-    def check_state_exist(self, state):
-        if state not in self.q_table.index:
-            # append new state to q table
-            self.q_table = self.q_table.append(
+    def check_state_exist(self, extra_state, state):
+        if extra_state not in self.q_table_category:
+            q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
+            q_table = q_table.append(
                 pd.Series(
-                    [0]*len(self.actions),
-                    index=self.q_table.columns,
+                    [0] * len(self.actions),
+                    index=q_table.columns,
                     name=state,
                 )
-)
+            )
+            self.q_table_category[extra_state] = q_table
+        else:
+            q_table = self.q_table_category[extra_state]
+            if state not in q_table.index:
+                # append new state to q table
+                q_table = q_table.append(
+                    pd.Series(
+                        [0]*len(self.actions),
+                        index=q_table.columns,
+                        name=state,
+                    )
+                )
+                self.q_table_category[extra_state] = q_table

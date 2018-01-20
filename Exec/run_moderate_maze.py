@@ -3,18 +3,21 @@ from LearningAlgos.moderate_maze_RL import QLearningTable
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
+import csv
 
 
 def learning(epi, time_in_ms, _is_render, QL, env):
     rewards = []
     time_array = []
     epo = []
+    step_array = []
 
     for episode in range(epi):
         # initiate the agent
         agent = env.reset()
         reward_in_each_epi = 0
         init_time = time.time()
+        step = 0
 
         while True:
             # fresh env
@@ -33,10 +36,14 @@ def learning(epi, time_in_ms, _is_render, QL, env):
             # swap observation
             agent = new_state
 
+            # count step
+            step = step + 1
+
             # break while loop when end of this episode
             if is_done:
                 rewards.append(reward_in_each_epi)
                 time_array.append(format(time.time() - init_time, '.2f'))
+                step_array.append(step)
                 # print(time_array)
                 epo.append(episode+1)
                 if _is_render:
@@ -52,9 +59,19 @@ def learning(epi, time_in_ms, _is_render, QL, env):
         time.sleep(1)
         env.destroy()
 
-    QL.q_table.to_csv("temp_q_table.csv", sep=',', encoding='utf-8')
-    print(QL.q_table)
+    qtable_keys = QL.q_table_category.keys()
+    with open('tmp_data/q_table_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
+        wr = csv.writer(f, quoting=csv.QUOTE_ALL)
+        wr.writerow(qtable_keys)
+    for key in qtable_keys:
+        QL.q_table_category[key].to_csv("tmp_data/temp_q_table_" + key + ".csv", sep=',', encoding='utf-8')
+        print(QL.q_table_category[key])
+    plt.figure(1)
     plt.plot(epo, rewards)
+    plt.figure(2)
+    plt.plot(epo, step_array)
+    plt.figure(3)
+    plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
     plt.show()
 
     # plt.plot(epo, rewards)
@@ -63,9 +80,13 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
 def running(epi, time_in_ms, _is_render, QL, env):
     try:
-        df = pd.DataFrame.from_csv('temp_q_table.csv', sep=',', encoding='utf8')
-        QL.set_prior_qtable(df)
-        print("set prior q")
+        with open('tmp_data/q_table_category.csv', 'r') as f:
+            reader = csv.reader(f)
+            qtable_keys = list(reader)[0]
+            for key in qtable_keys:
+                df = pd.DataFrame.from_csv("tmp_data/temp_q_table_" + key + ".csv", sep=',', encoding='utf8')
+                QL.set_prior_qtable(key, df)
+            print("set prior q")
     except Exception:
         pass
 
@@ -79,7 +100,7 @@ def running(epi, time_in_ms, _is_render, QL, env):
             env.render(time_in_ms)
 
             # RL choose action based on observation
-            action = QL.choose_action(str(agent))
+            action = QL.choose_action(agent)
 
             # RL take action and get next observation and reward
             new_state, reward, is_done = env.taking_action(action)
@@ -106,7 +127,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 1500
+    episodes = 600
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -126,7 +147,7 @@ if __name__ == "__main__":
     # set rewards
     # maze.set_fixed_obj([3, 4], 1, True)
     # demo_maze.set_fixed_obj([3, 4], 1, True)
-    maze.set_key_chest([10, 16], [2, 0], 'key', 8000, 50000)
+    maze.set_key_chest([10, 16], [2, 0], 'key', 800, 1200)
 
     # maze.set_fixed_obj([1, 3], 1, True)
     # demo_maze.set_fixed_obj([1, 3], 1, True)
@@ -147,9 +168,9 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.95
-    greedy = 0.25
+    greedy = 0.7
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
-    QLearner.set_greedy_rule([25, 150, 50], [0.95, 0.75, 0.9], 0.999)
+    QLearner.set_greedy_rule([0.9, 0.8, 0.7], episodes, 0.95)
 
     # run the simulation of training
     if not is_demo:

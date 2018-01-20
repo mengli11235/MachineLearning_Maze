@@ -244,6 +244,10 @@ class MazeSimulator(tk.Tk, object):
             obj = outcomes[0]
             reward = obj[1]
             is_done = obj[2]
+            if is_done:
+                if len(self.chest_list) != 0:
+                    is_done = False
+                    reward = self.step_penalty
             # if isinstance(is_done_content, str):
             #     idx_list = [idx for idx in range(len(self.object_list)) if self.object_list[idx][0][0] == self.agent[0]
             #      and self.object_list[idx][0][1] == self.agent[1]]
