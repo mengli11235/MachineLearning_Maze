@@ -1,7 +1,10 @@
 from MazeEnv.moderate_maze import MazeSimulator
-from LearningAlgos.moderate_maze_RL import QLearningTable
+from LearningAlgos.QLearning_RL import QLearningTable
 import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
+# import matplotlib.pyplot as plt
 import time
 import csv
 
@@ -73,10 +76,8 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     # plt.plot(epo, step_array)
     # plt.figure(3)
     # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
-    plt.show()
 
-    # plt.plot(epo, rewards)
-    # plt.show()
+    plt.show()
 
 
 def running(epi, time_in_ms, _is_render, QL, env):
@@ -114,10 +115,11 @@ def running(epi, time_in_ms, _is_render, QL, env):
             # break while loop when end of this episode
             if is_done:
                 break
-        if _is_render:
-            print(reward_in_each_epi)
 
-    # end of game
+        # if _is_render:
+            # print(reward_in_each_epi)
+
+    # end of game)
     print('game over')
     if _is_render:
         time.sleep(500)
@@ -144,7 +146,7 @@ if __name__ == "__main__":
     if is_demo:
         is_render = True
     maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
-    # demo_maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, True)
+
     maze.set_step_penalty(-1)
 
     # set fixed object ([column, row], reward, isFinishedWhenReach)
@@ -161,20 +163,13 @@ if __name__ == "__main__":
     # maze.set_collect_all_rewards([[3, 4], [1, 3]], 1, "golds")
     # demo_maze.set_collect_all_rewards([[3, 4], [1, 3]], 1, "golds")
 
-    # set traps
-    # maze.set_fixed_obj([1, 2], -1, True)
-    # demo_maze.set_fixed_obj([1, 2], -1, True)
-    # maze.set_fixed_obj([2, 1], -1, True)
-    # demo_maze.set_fixed_obj([2, 1], -1, True)
-
     # build the rendered maze
     maze.build_maze()
-    # demo_maze.build_maze()
 
     # initiate QLearner
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
-    reward_gamma = 0.975
+    reward_gamma = 0.95
     greedy = 0.4
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
     QLearner.set_greedy_rule([0.9], episodes, 0.9)

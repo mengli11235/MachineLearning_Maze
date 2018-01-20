@@ -13,13 +13,13 @@ class VTable:
         self.alphaV = alphaV                    # learning rate for v
         self.beta = beta
         self.gamma = reward_decay
-        self.w = np.zeros(self.q_table.shape[0])              # vector of conditioned reinforcement values, one for each state
+        self.w = np.zeros(self.q_table.shape[0])      # vector of conditioned reinforcement values, one for each state
         
     def probabilities(self, states):
         p = pd.DataFrame(columns=self.actions, dtype=np.float64)
         for s in range(states):
             initial = np.array((self.v[s, :] * self.beta))
-            vexp = np.exp(initial) # vector of exponents
+            vexp = np.exp(initial)  # vector of exponents
             vexp = vexp/sum(vexp)
             p[s] = vexp
 
@@ -32,7 +32,7 @@ class VTable:
         choice = np.random.choice(self.v[state, :], p=pr)
         return self.v[state, :].tolist().index(choice)
     
-    def learning(self,fromState, action, toState, world):
+    def learning(self, fromState, action, toState, world):
         totreward = world.values[toState] + self.w[toState]
         deltaV = self.alphaV * (totreward - self.v[fromState, action])
         self.v[fromState, action] += deltaV

@@ -2,18 +2,20 @@ import numpy as np
 import pandas as pd
 import math
 
-class QLearningTable:
 
-    def __init__(self, actions, learning_rate, reward_decay, e_greedy):
+class SarsaLambda:
+    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, trace_decay=0.9):
         self.actions = actions  # a list
         self.lr = learning_rate
         self.gamma = reward_decay
         self.global_e_greedy = e_greedy
-        self.q_table_category = {}
+        self.lambda_ = trace_decay
         self.greedy_dict = {}
         self.agent_extra_state = ""
         self.decay_count = 0
         self.max_reward = {}
+        self.q_table_category = {}
+        self.eligibility_trace_category = {}
 
     def set_prior_qtable(self, key, df_qtable):
         self.q_table_category[key] = df_qtable
@@ -23,8 +25,9 @@ class QLearningTable:
         target = 1 - max_greedy
         self.epoch_to_update = []
         for ind_greedy in greedy_rate:
-            rounds =  math.ceil(math.log(target / base, ind_greedy))
+            rounds = math.ceil(math.log(target / base, ind_greedy))
             epos = math.floor(episode/rounds)
+            epos = epos if epos > 0 else 1
             self.epoch_to_update.append(epos)
         self.greedy_rate = greedy_rate
         self.max_greedy = max_greedy
@@ -51,25 +54,56 @@ class QLearningTable:
             self.greedy_dict[key][0] = epi
             self.greedy_dict[key][1] = epsilon
 
+    def check_state_exist(self, extra_state, state):
+        if extra_state not in self.q_table_category:
+            q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
+            q_table = q_table.append(
+                pd.Series(
+                    [0] * len(self.actions),
+                    index=q_table.columns,
+                    name=state,
+                )
+            )
+            self.q_table_category[extra_state] = q_table
+            self.eligibility_trace_category[extra_state] = q_table.copy()
+        else:
+            q_table = self.q_table_category[extra_state]
+            if extra_state not in self.eligibility_trace_category:
+                self.eligibility_trace_category[extra_state] = q_table.copy()
+            eligibility = self.eligibility_trace_category[extra_state]
+            if state not in q_table.index:
+                # append new state to q table
+                to_append = pd.Series(
+                        [0] * len(self.actions),
+                        index=q_table.columns,
+                        name=state,
+                    )
+                q_table = q_table.append(to_append)
+                eligibility = eligibility.append(to_append)
+                self.q_table_category[extra_state] = q_table
+                self.eligibility_trace_category[extra_state] = eligibility
+
     def choose_action(self, state, extra_state):
-        # print()
         observation = str(state)
         self.check_state_exist(extra_state, observation)
         epsilon = self.global_e_greedy
+
         if extra_state in self.greedy_dict:
             epsilon = self.greedy_dict[extra_state][1]
+
         # action selection
-        if np.random.uniform() < epsilon:
+        if np.random.rand() < epsilon:
             # choose best action
-            state_action = self.q_table_category[extra_state].ix[observation, :]
-            state_action = state_action.reindex(np.random.permutation(state_action.index))     # some actions have same value
+            state_action = self.q_table_category[extra_state].loc[observation, :]
+            # when actions have the same value
+            state_action = state_action.reindex(np.random.permutation(state_action.index))
             action = state_action.idxmax()
         else:
             # choose random action
             action = np.random.choice(self.actions)
-        return int(action)
+        return action
 
-    def learn(self, _s, extra_s, a, r, _s_, extra_state, is_done):
+    def learn(self, _s, a, r, _s_, a_, extra_s, extra_state, is_done):
         reward_coefficient = 1
         virtual_done = False
         if is_done:
@@ -82,21 +116,38 @@ class QLearningTable:
 
         s = str(_s)
         s_ = str(_s_)
+
         self.check_state_exist(extra_state, s_)
-        q_predict = self.q_table_category[extra_s].ix[s, a]
+        q_predict = self.q_table_category[extra_s].loc[s, a]
+
         if virtual_done:
             next_expectation = 0 if extra_state not in self.max_reward else self.max_reward[extra_state]
             q_target = r + next_expectation
             reward_coefficient = self.check_max_reward(extra_s, q_target)
+            if q_target>1000:
+                a = 2
             # print(self.max_reward)
             # print(q_target)
         elif not is_done:
-            q_target = r + self.gamma * self.q_table_category[extra_state].ix[s_, :].max()  # next state is not terminal
+            q_target = r + self.gamma * self.q_table_category[extra_state].loc[s_, a_]  # next state is not terminal
         else:
             q_target = r  # next state is terminal
             reward_coefficient = self.check_max_reward(extra_s, q_target)
             # print(q_target)
-        self.q_table_category[extra_s].ix[s, a] += reward_coefficient * self.lr * (q_target - q_predict)  # update
+        error = q_target - q_predict
+
+        eligibility = self.eligibility_trace_category[extra_s]
+
+        eligibility.loc[s, :] *= 0
+        eligibility.loc[s, a] = 1
+
+        # Q update
+        self.q_table_category[extra_s] += reward_coefficient * self.lr * error * eligibility
+
+        # decay eligibility trace after update
+        eligibility *= self.gamma * self.lambda_
+
+        self.eligibility_trace_category[extra_s] = eligibility
 
     def check_max_reward(self, state_key, r):
         # print(self.max_reward)
@@ -111,40 +162,12 @@ class QLearningTable:
         else:
             max_val = self.max_reward[state_key]
             if max_val > r:
-                self.max_reward[state_key] = 0.9999*self.max_reward[state_key]
-                return 1 - math.tanh(-math.log2(r/max_val))*3
+                self.max_reward[state_key] = 0.99 * self.max_reward[state_key]
+                return 1 - math.tanh(-math.log2(r / max_val)) * 3
             else:
                 self.max_reward[state_key] = r
                 return 1
 
-    def check_state_exist(self, extra_state, state):
-        if extra_state not in self.q_table_category:
-            q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
-            q_table = q_table.append(
-                pd.Series(
-                    [0] * len(self.actions),
-                    index=q_table.columns,
-                    name=state,
-                )
-            )
-            self.q_table_category[extra_state] = q_table
-        else:
-            q_table = self.q_table_category[extra_state]
-            if state not in q_table.index:
-                # append new state to q table
-                q_table = q_table.append(
-                    pd.Series(
-                        [0]*len(self.actions),
-                        index=q_table.columns,
-                        name=state,
-                    )
-                )
-                self.q_table_category[extra_state] = q_table
-
-    def print_list(self, ls):
-        str_val = ""
-        if len(ls) == 0:
-            return "[]"
-        for obj in ls:
-            str_val += obj
-        return str_val
+    def reset_trace(self):
+        for key in self.eligibility_trace_category.keys():
+            self.eligibility_trace_category[key] *= 0
