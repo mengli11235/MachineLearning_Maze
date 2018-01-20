@@ -111,7 +111,7 @@ class QLearningTable:
         else:
             max_val = self.max_reward[state_key]
             if max_val > r:
-                self.max_reward[state_key] = 0.99*self.max_reward[state_key]
+                self.max_reward[state_key] = 0.9999*self.max_reward[state_key]
                 return 1 - math.tanh(-math.log2(r/max_val))*3
             else:
                 self.max_reward[state_key] = r
