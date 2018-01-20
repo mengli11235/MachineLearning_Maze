@@ -1,7 +1,10 @@
 from MazeEnv.moderate_maze import MazeSimulator
-from LearningAlgos.moderate_maze_RL import QLearningTable
+from LearningAlgos.QLearning_RL import QLearningTable
 import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
+# import matplotlib.pyplot as plt
 import time
 
 
@@ -55,11 +58,8 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     print(QL.q_table)
 
     plt.plot(epo, rewards)
+    plt.title('rewards in each epoch')
     plt.show()
-
-    # plt.plot(epo, rewards)
-    # plt.title('rewards in each epoch')
-    # plt.show()
 
 
 def running(epi, time_in_ms, _is_render, QL, env):
@@ -96,7 +96,7 @@ def running(epi, time_in_ms, _is_render, QL, env):
         # if _is_render:
             # print(reward_in_each_epi)
 
-    # end of game
+    # end of game)
     print('game over')
     if _is_render:
         time.sleep(1)
@@ -122,10 +122,10 @@ if __name__ == "__main__":
     if is_demo:
         is_render = True
     maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
-    # demo_maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, True)
+
     maze.set_step_penalty(-1)
 
-    maze.set_key_chest([10, 16], [9, 4], 'key', 800, 5000)
+    maze.set_key_chest([10, 16], [9, 4], 'key', 800, 1200)
 
     # build the rendered maze
     maze.build_maze()

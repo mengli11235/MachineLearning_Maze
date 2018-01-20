@@ -141,10 +141,9 @@ class MazeSimulator(tk.Tk, object):
     def set_key_chest(self, key_position, reward_position, key, key_reward, chest_reward):
         self.key_chest_to_set.append([key_position, reward_position, key, key_reward, chest_reward])
 
-    def set_collect_all_rewards(self, reward_position_list, reward, flag_name):
-        for ind_pos in reward_position_list:
-            self.set_fixed_obj(ind_pos, reward, flag_name)
-        #self.ending_con_map[flag_name] = len(reward_position_list) # add new keys to dic
+    # def set_collect_all_rewards(self, reward_position_list, reward, flag_name):
+    #     for ind_pos in reward_position_list:
+    #         self.set_fixed_obj(ind_pos, reward, flag_name)
 
     def build_maze(self):
         self.final_object_list = self.object_list[:]
@@ -155,7 +154,7 @@ class MazeSimulator(tk.Tk, object):
     def reset(self):
         self.agent[0] = self.init_position[0]
         self.agent[1] = self.init_position[1]
-        self.agent_con_map = {}
+        # self.agent_con_map = {}
         self.object_list = self.final_object_list[:]
         self.agent_keys = []
         self.agent_chests = []
@@ -242,31 +241,8 @@ class MazeSimulator(tk.Tk, object):
             obj = outcomes[0]
             reward = obj[1]
             is_done = obj[2]
-            # if isinstance(is_done_content, str):
-            #     idx_list = [idx for idx in range(len(self.object_list)) if self.object_list[idx][0][0] == self.agent[0]
-            #      and self.object_list[idx][0][1] == self.agent[1]]
-            #     for index in idx_list:
-            #         del self.object_list[index]
-            #     if is_done_content in self.agent_con_map:
-            #         self.agent_con_map[is_done_content] = self.agent_con_map[is_done_content] + 1
-            #
-            #     else:
-            #         self.agent_con_map[is_done_content] = 1
-            #
-            #     if self.ending_con_map[is_done_content] == self.agent_con_map[is_done_content]:
-            #         is_done = True
-            #     else:
-            #         is_done = False
-            # else:
-            #    is_done = is_done_content
         else:
             is_done, reward = self.check_key_chest(self.agent)
-            # is_done = False
-
-            # if reward > 0:
-            #     is_done = True
-            # else:
-            #     is_done = False
 
         if is_done:
             if self.is_render:

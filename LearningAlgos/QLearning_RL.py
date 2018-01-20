@@ -52,7 +52,8 @@ class QLearningTable:
         if np.random.uniform() < epsilon:
             # choose best action
             state_action = self.q_table.ix[observation, :]
-            state_action = state_action.reindex(np.random.permutation(state_action.index))     # some actions have same value
+            # when actions have the same value
+            state_action = state_action.reindex(np.random.permutation(state_action.index))
             action = state_action.idxmax()
         else:
             # choose random action

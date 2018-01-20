@@ -3,7 +3,7 @@
 """
 
 from MazeEnv.moderate_maze import MazeSimulator
-from LearningAlgos.RL_brain import SarsaLambdaTable
+from LearningAlgos.Sarsa_lambda_RL import SarsaLambda
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -36,27 +36,26 @@ def learning(epi, time_in_ms, _is_render, RL, env):
             env.render(time_in_ms)
 
             # RL take action and get next observation and reward
-            observation_, reward, done = env.taking_action(action)
+            observation_, reward, is_done = env.taking_action(action)
             reward_in_epoch += reward
 
             # RL choose action based on next observation
             action_ = RL.choose_action(str(observation_))
 
             # RL learn from this transition (s, a, r, s, a) ==> Sarsa
-            RL.learn(str(observation), action, reward, str(observation_), action_)
+            RL.learn(str(observation), action, reward, str(observation_), action_, is_done)
 
             # swap observation and action
             observation = observation_
             action = action_
 
             # break while loop when end of this episode
-            if done:
+            if is_done:
                 rewards.append(reward_in_epoch)
                 time_array.append(format(time.time()-init_time, '.2f'))
 
-                epo.append(episode+1)
+                epo.append(episode + 1)
                 break
-            step += 1
 
     # end of game
     print('game over, total rewards gained for each epoch:')
@@ -79,13 +78,10 @@ def running(epi, time_in_ms, _is_render, RL, env):
     except Exception:
         pass
 
-    step = 0
     rewards = []
     time_array = []
     epo = []
     for episode in range(epi):
-        # initial observation
-        observation = env.reset()
         reward_in_epoch = 0
         init_time = time.time()
 
@@ -103,21 +99,18 @@ def running(epi, time_in_ms, _is_render, RL, env):
             env.render(time_in_ms)
 
             # RL take action and get next observation and reward
-            observation_, reward, done = env.taking_action(action)
+            observation_, reward, is_done = env.taking_action(action)
             reward_in_epoch += reward
 
             # RL choose action based on next observation
             action_ = RL.choose_action(str(observation_))
-
-            # RL learn from this transition (s, a, r, s, a) ==> Sarsa
-            # RL.learn(str(observation), action, reward, str(observation_), action_)
 
             # swap observation and action
             observation = observation_
             action = action_
 
             # break while loop when end of this episode
-            if done:
+            if is_done:
                 rewards.append(reward_in_epoch)
                 time_array.append(format(time.time()-init_time, '.2f'))
                 epo.append(episode+1)
@@ -143,7 +136,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 300
+    episodes = 100
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -156,7 +149,10 @@ if __name__ == "__main__":
     if is_demo:
         is_render = True
     maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
-    maze.set_key_chest([1, 0], [11, 15], 'key', 1500)
+
+    maze.set_step_penalty(-1)
+
+    maze.set_key_chest([1, 0], [11, 15], 'key',800, 1500)
     maze.set_step_penalty(-1)
 
     # build the rendered maze
@@ -167,11 +163,12 @@ if __name__ == "__main__":
     learning_rate = 0.1
     reward_gamma = 0.95
     greedy = 0.7
-    SLearner = SarsaLambdaTable(actions, 
-                                learning_rate, 
-                                reward_decay=reward_gamma, e_greedy=greedy, 
-                                trace_decay=0.9
-                                )
+    SLearner = SarsaLambda(actions,
+                           learning_rate,
+                           reward_decay=reward_gamma, e_greedy=greedy,
+                           trace_decay=0.9
+                           )
+    SLearner.set_greedy_rule(20, 0.9)
 
     if not is_demo:
         # run the simulation of training
