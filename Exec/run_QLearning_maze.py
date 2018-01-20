@@ -129,7 +129,7 @@ def running(epi, time_in_ms, _is_render, QL, env):
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
-    is_demo = False
+    is_demo = True
 
     # set number of runs
     episodes = 1200
