@@ -1,9 +1,6 @@
-"""
-
-"""
-
 import numpy as np
 import pandas as pd
+import math
 
 
 class QLearningTable:
@@ -13,79 +10,144 @@ class QLearningTable:
         self.lr = learning_rate
         self.gamma = reward_decay
         self.global_e_greedy = e_greedy
-        self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
+        self.q_table_category = {}
         self.greedy_dict = {}
         self.agent_extra_state = ""
+        self.decay_count = 0
+        self.max_reward = {}
 
-    def set_prior_qtable(self, df_qtable):
-        self.q_table = df_qtable
+    def set_prior_qtable(self, key, df_qtable):
+        self.q_table_category[key] = df_qtable
 
-    def set_greedy_rule(self, epoch_to_update, greedy_rate):
-        self.epoch_to_update = epoch_to_update
+    def set_greedy_rule(self, greedy_rate, episode, max_greedy):
+        base = 1 - self.global_e_greedy
+        target = 1 - max_greedy
+        self.epoch_to_update = []
+        for ind_greedy in greedy_rate:
+            rounds = math.ceil(math.log(target / base, ind_greedy))
+            epos = math.floor(episode/rounds)
+            epos = epos if epos > 0 else 1
+            self.epoch_to_update.append(epos)
         self.greedy_rate = greedy_rate
+        self.max_greedy = max_greedy
 
     def update_episode(self, key):
         if key not in self.greedy_dict:
-            self.greedy_dict[key] = [1, self.global_e_greedy]
+            self.greedy_dict[key] = [1, self.global_e_greedy, self.epoch_to_update[self.decay_count], self.greedy_rate[self.decay_count]]
+            if len(self.epoch_to_update) > self.decay_count + 1:
+                self.decay_count = self.decay_count + 1
         else:
             obj = self.greedy_dict[key]
             epi = obj[0] + 1
             epsilon = obj[1]
-            if epi != 0 and epi % self.epoch_to_update == 0:
+            epoch_update = obj[2]
+            if epi != 0 and epi % epoch_update == 0 and epsilon != self.max_greedy:
+                greedy_rate = obj[3]
+                epsilon = 1 - (1 - epsilon) * greedy_rate
+                epsilon = self.max_greedy if epsilon > self.max_greedy else epsilon
                 print(key)
                 print(epi)
                 print(epsilon)
                 print()
-                epsilon = 1 - (1 - epsilon) * self.greedy_rate
                 # print(epsilon)
-            self.greedy_dict[key] = [epi, epsilon]
+            self.greedy_dict[key][0] = epi
+            self.greedy_dict[key][1] = epsilon
 
-    def choose_action(self, state):
-        extra_state = str(state[2:4])
+    def choose_action(self, state, extra_state):
         # print()
         observation = str(state)
-        self.check_state_exist(observation)
+        self.check_state_exist(extra_state, observation)
         epsilon = self.global_e_greedy
         if extra_state in self.greedy_dict:
             epsilon = self.greedy_dict[extra_state][1]
         # action selection
         if np.random.uniform() < epsilon:
             # choose best action
-            state_action = self.q_table.ix[observation, :]
-            # when actions have the same value
-            state_action = state_action.reindex(np.random.permutation(state_action.index))
+            state_action = self.q_table_category[extra_state].ix[observation, :]
+            state_action = state_action.reindex(np.random.permutation(state_action.index))     # some actions have same value
             action = state_action.idxmax()
         else:
             # choose random action
             action = np.random.choice(self.actions)
         return int(action)
 
-    def learn(self, _s, a, r, _s_, is_done):
-        extra_state = str(_s_[2:4])
-        if extra_state != self.agent_extra_state:
-            # future extra_state not [0, 0]
-            if not(_s_[2] == 0 and _s_[3] == 0):
-                is_done = True
-            self.agent_extra_state = extra_state
+    def learn(self, _s, extra_s, a, r, _s_, extra_state, is_done):
+        reward_coefficient = 1
+        virtual_done = False
+        if is_done:
+            self.agent_extra_state = ""
+        elif extra_state != self.agent_extra_state:
+            if extra_state != '[]_[]':
+                virtual_done = True
             self.update_episode(extra_state)
+            self.agent_extra_state = extra_state
 
         s = str(_s)
         s_ = str(_s_)
-        self.check_state_exist(s_)
-        q_predict = self.q_table.ix[s, a]
-        if not is_done:
-            q_target = r + self.gamma * self.q_table.ix[s_, :].max()  # next state is not terminal
+        self.check_state_exist(extra_state, s_)
+        q_predict = self.q_table_category[extra_s].ix[s, a]
+
+        if virtual_done:
+            next_expectation = 0 if extra_state not in self.max_reward else self.max_reward[extra_state]
+            q_target = r + next_expectation
+            reward_coefficient = self.check_max_reward(extra_s, q_target)
+            # print(self.max_reward)
+            # print(q_target)
+        elif not is_done:
+            q_target = r + self.gamma * self.q_table_category[extra_state].ix[s_, :].max()  # next state is not terminal
         else:
             q_target = r  # next state is terminal
-        self.q_table.ix[s, a] += self.lr * (q_target - q_predict)  # update
+            reward_coefficient = self.check_max_reward(extra_s, q_target)
+            # print(q_target)
+        self.q_table_category[extra_s].ix[s, a] += reward_coefficient * self.lr * (q_target - q_predict)  # update
 
-    def check_state_exist(self, state):
-        if state not in self.q_table.index:
-            # append new state to q table
-            self.q_table = self.q_table.append(
+    def check_max_reward(self, state_key, r):
+        # print(self.max_reward)
+        # print(r)
+        # print()
+        if r <= 0:
+            return 1
+
+        if state_key not in self.max_reward:
+            self.max_reward[state_key] = r
+            return 1
+        else:
+            max_val = self.max_reward[state_key]
+            if max_val > r:
+                self.max_reward[state_key] = 0.99*self.max_reward[state_key]
+                return 1 - math.tanh(-math.log2(r/max_val))*3
+            else:
+                self.max_reward[state_key] = r
+                return 1
+
+    def check_state_exist(self, extra_state, state):
+        if extra_state not in self.q_table_category:
+            q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
+            q_table = q_table.append(
                 pd.Series(
-                    [0]*len(self.actions),
-                    index=self.q_table.columns,
+                    [0] * len(self.actions),
+                    index=q_table.columns,
                     name=state,
                 )
-)
+            )
+            self.q_table_category[extra_state] = q_table
+        else:
+            q_table = self.q_table_category[extra_state]
+            if state not in q_table.index:
+                # append new state to q table
+                q_table = q_table.append(
+                    pd.Series(
+                        [0]*len(self.actions),
+                        index=q_table.columns,
+                        name=state,
+                    )
+                )
+                self.q_table_category[extra_state] = q_table
+
+    def print_list(self, ls):
+        str_val = ""
+        if len(ls) == 0:
+            return "[]"
+        for obj in ls:
+            str_val += obj
+        return str_val
