@@ -120,17 +120,17 @@ def running(epi, time_in_ms, _is_render, QL, env):
     # end of game
     print('game over')
     if _is_render:
-        time.sleep(1)
+        time.sleep(500)
         env.destroy()
 
 
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
-    is_demo = False
+    is_demo = True
 
     # set number of runs
-    episodes = 1200
+    episodes = 2100
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -151,8 +151,9 @@ if __name__ == "__main__":
     # set rewards
     # maze.set_fixed_obj([3, 4], 1, True)
     # demo_maze.set_fixed_obj([3, 4], 1, True)
-    maze.set_key_chest([19, 19], [0, 0], 'key', 0, 600)
-    maze.set_key_chest([3, 3], [18, 18], 'key2', 0, 800)
+    maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
+    maze.set_key_chest([3, 3], [18, 15], 'key2', 0, 800)
+    maze.set_key_chest([2, 14], [18, 4], 'key3', 0, 1000)
     # maze.set_fixed_obj([17, 15], 800, True)
 
     # maze.set_fixed_obj([1, 3], 1, True)
@@ -174,7 +175,7 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.975
-    greedy = 0.45
+    greedy = 0.4
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
     QLearner.set_greedy_rule([0.9], episodes, 0.9)
 
@@ -188,7 +189,7 @@ if __name__ == "__main__":
     else:
         # Q decision with 99% greedy strategy
         demo_greedy = 0.99
-        demo_interval = 0.05
+        demo_interval = 0.1
         QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy)
         running(30, demo_interval, True, QRunner, maze)
 
