@@ -67,11 +67,12 @@ class QLearningTable:
         return int(action)
 
     def learn(self, _s, a, r, _s_, is_done):
+        is_virtual_done = False
         extra_state = str(_s_[2:4])
         if extra_state != self.agent_extra_state:
             # future extra_state not [0, 0]
             if not(_s_[2] == 0 and _s_[3] == 0):
-                is_done = True
+                is_virtual_done = True
             self.agent_extra_state = extra_state
             self.update_episode(extra_state)
 

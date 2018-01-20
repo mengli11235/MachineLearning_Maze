@@ -39,7 +39,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
                 time_array.append(format(time.time() - init_time, '.2f'))
                 # print(time_array)
                 epo.append(episode+1)
-                if _is_render or episode % 50 == 0:
+                if _is_render:
                     # print(episode/epi)
                     print(reward_in_each_epi)
                     print()
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 900
+    episodes = 1500
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     # set rewards
     # maze.set_fixed_obj([3, 4], 1, True)
     # demo_maze.set_fixed_obj([3, 4], 1, True)
-    maze.set_key_chest([10, 16], [9, 4], 'key', 800, 5000)
+    maze.set_key_chest([10, 16], [2, 0], 'key', 8000, 50000)
 
     # maze.set_fixed_obj([1, 3], 1, True)
     # demo_maze.set_fixed_obj([1, 3], 1, True)
@@ -146,10 +146,10 @@ if __name__ == "__main__":
     # initiate QLearner
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
-    reward_gamma = 0.975
-    greedy = 0.7
+    reward_gamma = 0.95
+    greedy = 0.25
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
-    QLearner.set_greedy_rule([20, 20, 20], [0.9, 0.9, 0.9], 0.975)
+    QLearner.set_greedy_rule([25, 150, 50], [0.95, 0.75, 0.9], 0.999)
 
     # run the simulation of training
     if not is_demo:
