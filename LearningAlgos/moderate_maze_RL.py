@@ -13,6 +13,7 @@ class QLearningTable:
         self.greedy_dict = {}
         self.agent_extra_state = ""
         self.decay_count = 0
+        self.max_reward = {}
 
     def set_prior_qtable(self, key, df_qtable):
         self.q_table_category[key] = df_qtable
@@ -69,25 +70,54 @@ class QLearningTable:
         return int(action)
 
     def learn(self, _s, a, r, _s_, is_done):
-        is_virtual_done = False
-        extra_state = str(_s_[2:4])
-        if extra_state != self.agent_extra_state:
-            # future extra_state not [0, 0]
-            if not(_s_[2] == 0 and _s_[3] == 0):
-                is_virtual_done = True
-            self.agent_extra_state = extra_state
-            self.update_episode(extra_state)
-
+        reward_coefficient = 1
         extra_s = str(_s[2:4])
+        extra_state = str(_s_[2:4])
+        virtual_done = False
+        if is_done:
+            self.agent_extra_state = ""
+        elif extra_state != self.agent_extra_state:
+            if not(_s_[2] == 0 and _s_[3] == 0):
+                virtual_done = True
+            self.update_episode(extra_state)
+            self.agent_extra_state = extra_state
+
         s = str(_s[0:2])
         s_ = str(_s_[0:2])
         self.check_state_exist(extra_state, s_)
         q_predict = self.q_table_category[extra_s].ix[s, a]
-        if not is_done:
+        if virtual_done:
+            next_expectation = 0 if extra_state not in self.max_reward else self.max_reward[extra_state]
+            q_target = r + next_expectation
+            reward_coefficient = self.check_max_reward(extra_s, q_target)
+            # print(self.max_reward)
+            # print(q_target)
+        elif not is_done:
             q_target = r + self.gamma * self.q_table_category[extra_state].ix[s_, :].max()  # next state is not terminal
         else:
             q_target = r  # next state is terminal
-        self.q_table_category[extra_s].ix[s, a] += self.lr * (q_target - q_predict)  # update
+            reward_coefficient = self.check_max_reward(extra_s, q_target)
+            # print(q_target)
+        self.q_table_category[extra_s].ix[s, a] += reward_coefficient * self.lr * (q_target - q_predict)  # update
+
+    def check_max_reward(self, state_key, r):
+        # print(self.max_reward)
+        # print(r)
+        # print()
+        if r <= 0:
+            return 1
+
+        if state_key not in self.max_reward:
+            self.max_reward[state_key] = r
+            return 1
+        else:
+            max_val = self.max_reward[state_key]
+            if max_val > r:
+                self.max_reward[state_key] = 0.99*self.max_reward[state_key]
+                return 1 - math.tanh(-math.log2(r/max_val))*3
+            else:
+                self.max_reward[state_key] = r
+                return 1
 
     def check_state_exist(self, extra_state, state):
         if extra_state not in self.q_table_category:

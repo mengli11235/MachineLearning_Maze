@@ -126,8 +126,9 @@ if __name__ == "__main__":
     # set if render the GUI
     is_render = False
     is_demo = False
+
     # set number of runs
-    episodes = 600
+    episodes = 1200
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -135,6 +136,7 @@ if __name__ == "__main__":
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
+    # init_pos = [10, 16]
 
     # initiate maze simulator for learning and running
     if is_demo:
@@ -147,7 +149,8 @@ if __name__ == "__main__":
     # set rewards
     # maze.set_fixed_obj([3, 4], 1, True)
     # demo_maze.set_fixed_obj([3, 4], 1, True)
-    maze.set_key_chest([10, 16], [2, 0], 'key', 800, 1200)
+    maze.set_key_chest([19, 19], [0, 0], 'key', 0, 600)
+    # maze.set_fixed_obj([17, 15], 800, True)
 
     # maze.set_fixed_obj([1, 3], 1, True)
     # demo_maze.set_fixed_obj([1, 3], 1, True)
@@ -168,9 +171,9 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.95
-    greedy = 0.7
+    greedy = 0.3
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
-    QLearner.set_greedy_rule([0.9, 0.8, 0.7], episodes, 0.95)
+    QLearner.set_greedy_rule([0.9, 0.9, 0.7], episodes, 0.95)
 
     # run the simulation of training
     if not is_demo:
