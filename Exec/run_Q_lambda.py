@@ -1,5 +1,5 @@
 from MazeEnv.moderate_maze import MazeSimulator
-from LearningAlgos.QLearning_RL import QLearningTable
+from LearningAlgos.Q_lambda_RL import QLearningTable
 import pandas as pd
 import matplotlib
 matplotlib.use("TkAgg")
@@ -21,6 +21,9 @@ def learning(epi, time_in_ms, _is_render, QL, env):
         reward_in_each_epi = 0
         init_time = time.time()
         step = 0
+
+        # initial all zero eligibility trace
+        QL.reset_trace()
 
         while True:
             # fresh env
@@ -64,11 +67,11 @@ def learning(epi, time_in_ms, _is_render, QL, env):
         env.destroy()
 
     qtable_keys = QL.q_table_category.keys()
-    with open('tmp_data/q_table_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
+    with open('tmp_data/q_lambda_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
         wr = csv.writer(f, quoting=csv.QUOTE_ALL)
         wr.writerow(qtable_keys)
     for key in qtable_keys:
-        QL.q_table_category[key].to_csv("tmp_data/temp_q_table_" + key + ".csv", sep=',', encoding='utf-8')
+        QL.q_table_category[key].to_csv("tmp_data/temp_q_lambda_" + key + ".csv", sep=',', encoding='utf-8')
         print(QL.q_table_category[key])
     plt.figure(1)
     plt.plot(epo, rewards)
@@ -82,11 +85,11 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
 def running(epi, time_in_ms, _is_render, QL, env):
     try:
-        with open('tmp_data/q_table_category.csv', 'r') as f:
+        with open('tmp_data/q_lambda_category.csv', 'r') as f:
             reader = csv.reader(f)
             qtable_keys = list(reader)[0]
             for key in qtable_keys:
-                df = pd.DataFrame.from_csv("tmp_data/temp_q_table_" + key + ".csv", sep=',', encoding='utf8')
+                df = pd.DataFrame.from_csv("tmp_data/temp_q_lambda_" + key + ".csv", sep=',', encoding='utf8')
                 QL.set_prior_qtable(key, df)
             print("set prior q")
     except Exception:
@@ -129,7 +132,7 @@ def running(epi, time_in_ms, _is_render, QL, env):
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
-    is_demo = True
+    is_demo = False
     # set number of runs
     episodes = 2100
     # animation interval
@@ -165,9 +168,9 @@ if __name__ == "__main__":
     learning_rate = 0.1
     reward_gamma = 0.95
     greedy = 0.4
-
+    lambda_val = 0.6
     max_reward_coefficient = 0.75
-    QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, max_reward_coefficient)
+    QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, lambda_val, max_reward_coefficient)
     QLearner.set_greedy_rule([0.9], episodes*0.9, 0.95)
 
     # run the training

@@ -41,7 +41,7 @@ class MazeSimulator(tk.Tk, object):
             [[2, 3], [10, 9]],
             np.float64)
         exits = np.array(
-            [[18, 6]],
+            [[18, 1]],
             np.float64)
 
         self._init_grid()
