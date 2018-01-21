@@ -163,7 +163,7 @@ class SarsaLambda:
             max_reward_coefficient = self.max_reward_coefficient
             if max_val > r:
                 max_reward_coefficient = 0.999 if max_reward_coefficient >= 1 else max_reward_coefficient
-                std_unit = max_reward_coefficient * (1 - max_reward_coefficient) * 1000
+                std_unit = max_reward_coefficient * (1 - max_reward_coefficient) * max_val
                 se = (r - max_val * max_reward_coefficient) / std_unit
                 return se
             else:
