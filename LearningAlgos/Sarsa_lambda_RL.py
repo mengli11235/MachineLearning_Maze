@@ -4,7 +4,7 @@ import math
 
 
 class SarsaLambda:
-    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, trace_decay=0.9):
+    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, trace_decay=0.9, max_reward_coefficient=0.9):
         self.actions = actions  # a list
         self.lr = learning_rate
         self.gamma = reward_decay
@@ -14,6 +14,7 @@ class SarsaLambda:
         self.agent_extra_state = ""
         self.decay_count = 0
         self.max_reward = {}
+        self.max_reward_coefficient = max_reward_coefficient
         self.q_table_category = {}
         self.eligibility_trace_category = {}
 
@@ -124,8 +125,6 @@ class SarsaLambda:
             next_expectation = 0 if extra_state not in self.max_reward else self.max_reward[extra_state]
             q_target = r + next_expectation
             reward_coefficient = self.check_max_reward(extra_s, q_target)
-            if q_target>1000:
-                a = 2
             # print(self.max_reward)
             # print(q_target)
         elif not is_done:
@@ -138,11 +137,11 @@ class SarsaLambda:
 
         eligibility = self.eligibility_trace_category[extra_s]
 
-        eligibility.loc[s, :] *= 0
-        eligibility.loc[s, a] = 1
+        # eligibility.loc[s, :] *= 0
+        eligibility.loc[s, a] += 1
 
         # Q update
-        self.q_table_category[extra_s] += reward_coefficient * self.lr * error * eligibility
+        self.q_table_category[extra_s] += 1 * self.lr * error * eligibility * reward_coefficient
 
         # decay eligibility trace after update
         eligibility *= self.gamma * self.lambda_
@@ -161,9 +160,12 @@ class SarsaLambda:
             return 1
         else:
             max_val = self.max_reward[state_key]
+            max_reward_coefficient = self.max_reward_coefficient
             if max_val > r:
-                self.max_reward[state_key] = 0.99 * self.max_reward[state_key]
-                return 1 - math.tanh(-math.log2(r / max_val)) * 3
+                max_reward_coefficient = 0.999 if max_reward_coefficient >= 1 else max_reward_coefficient
+                std_unit = max_reward_coefficient * (1 - max_reward_coefficient) * 1000
+                se = (r - max_val * max_reward_coefficient) / std_unit
+                return se
             else:
                 self.max_reward[state_key] = r
                 return 1

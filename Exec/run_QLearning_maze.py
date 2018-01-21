@@ -116,8 +116,8 @@ def running(epi, time_in_ms, _is_render, QL, env):
             if is_done:
                 break
 
-        # if _is_render:
-            # print(reward_in_each_epi)
+        if _is_render:
+            print(reward_in_each_epi)
 
     # end of game)
     print('game over')
@@ -130,9 +130,8 @@ if __name__ == "__main__":
     # set if render the GUI
     is_render = False
     is_demo = True
-
     # set number of runs
-    episodes = 2100
+    episodes = 1500
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -140,7 +139,6 @@ if __name__ == "__main__":
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
-    # init_pos = [10, 16]
 
     # initiate maze simulator for learning and running
     if is_demo:
@@ -150,18 +148,14 @@ if __name__ == "__main__":
     maze.set_step_penalty(-1)
 
     # set fixed object ([column, row], reward, isFinishedWhenReach)
-    # set rewards
-    # maze.set_fixed_obj([3, 4], 1, True)
-    # demo_maze.set_fixed_obj([3, 4], 1, True)
-    maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
-    maze.set_key_chest([3, 3], [18, 15], 'key2', 0, 800)
-    maze.set_key_chest([2, 14], [18, 4], 'key3', 0, 1000)
-    # maze.set_fixed_obj([17, 15], 800, True)
+    maze.set_fixed_obj([8, 8], -1000, False)
+    maze.set_key_chest([7, 5], [2, 17], 'k', 600, 1000)
+    maze.set_key_chest([19, 15], [0, 0], 'k2', 0, 600)
+    # maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
 
-    # maze.set_fixed_obj([1, 3], 1, True)
-    # demo_maze.set_fixed_obj([1, 3], 1, True)
-    # maze.set_collect_all_rewards([[3, 4], [1, 3]], 1, "golds")
-    # demo_maze.set_collect_all_rewards([[3, 4], [1, 3]], 1, "golds")
+    # maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
+    # maze.set_key_chest([3, 3], [18, 15], 'key2', 0, 800)
+    # maze.set_key_chest([2, 14], [18, 4], 'key3', 0, 1000)
 
     # build the rendered maze
     maze.build_maze()
@@ -171,20 +165,22 @@ if __name__ == "__main__":
     learning_rate = 0.1
     reward_gamma = 0.95
     greedy = 0.4
-    QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy)
-    QLearner.set_greedy_rule([0.9], episodes, 0.9)
 
-    # run the simulation of training
+    max_reward_coefficient = 0.75
+    QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, max_reward_coefficient)
+    QLearner.set_greedy_rule([0.9], episodes*0.9, 0.95)
+
+    # run the training
     if not is_demo:
         if is_render:
             maze.after(1, learning(episodes, interval, is_render, QLearner, maze))
             maze.mainloop()
         else:
             learning(episodes, interval, is_render, QLearner, maze)
+    # run the simulation of result
     else:
         # Q decision with 99% greedy strategy
         demo_greedy = 0.99
-        demo_interval = 0.1
-        QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy)
+        demo_interval = 0.05
+        QRunner = QLearningTable(actions, learning_rate, reward_gamma, demo_greedy, max_reward_coefficient)
         running(30, demo_interval, True, QRunner, maze)
-

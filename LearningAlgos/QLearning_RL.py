@@ -5,7 +5,7 @@ import math
 
 class QLearningTable:
 
-    def __init__(self, actions, learning_rate, reward_decay, e_greedy):
+    def __init__(self, actions, learning_rate, reward_decay, e_greedy, max_reward_coefficient):
         self.actions = actions  # a list
         self.lr = learning_rate
         self.gamma = reward_decay
@@ -15,6 +15,7 @@ class QLearningTable:
         self.agent_extra_state = ""
         self.decay_count = 0
         self.max_reward = {}
+        self.max_reward_coefficient = max_reward_coefficient
 
     def set_prior_qtable(self, key, df_qtable):
         self.q_table_category[key] = df_qtable
@@ -113,9 +114,12 @@ class QLearningTable:
             return 1
         else:
             max_val = self.max_reward[state_key]
+            max_reward_coefficient = self.max_reward_coefficient
             if max_val > r:
-                self.max_reward[state_key] = 0.9999*self.max_reward[state_key]
-                return 1 - math.tanh(-math.log2(r/max_val))*3
+                max_reward_coefficient = 0.999 if max_reward_coefficient >= 1 else max_reward_coefficient
+                std_unit = max_reward_coefficient * (1 - max_reward_coefficient) * 1000
+                se = (r - max_val * max_reward_coefficient) / std_unit
+                return se
             else:
                 self.max_reward[state_key] = r
                 return 1
