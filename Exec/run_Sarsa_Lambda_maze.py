@@ -145,7 +145,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = True
     # set number of runs
-    episodes = 1500
+    episodes = 2100
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     maze.set_fixed_obj([8, 8], -1000, False)
     maze.set_key_chest([7, 5], [2, 17], 'k', 600, 1000)
     maze.set_key_chest([19, 15], [0, 0], 'k2', 0, 600)
-    # maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
+    maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
 
     # maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
     # maze.set_key_chest([3, 3], [18, 15], 'key2', 0, 800)

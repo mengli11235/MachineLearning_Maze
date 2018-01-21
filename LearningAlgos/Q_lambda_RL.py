@@ -3,7 +3,7 @@ import pandas as pd
 import math
 
 
-class SarsaLambda:
+class QLearningTable:
     def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, trace_decay=0.9, max_reward_coefficient=0.9):
         self.actions = actions  # a list
         self.lr = learning_rate
@@ -93,7 +93,7 @@ class SarsaLambda:
             epsilon = self.greedy_dict[extra_state][1]
 
         # action selection
-        if np.random.rand() < epsilon:
+        if np.random.uniform() < epsilon:
             # choose best action
             state_action = self.q_table_category[extra_state].loc[observation, :]
             # when actions have the same value
@@ -104,7 +104,7 @@ class SarsaLambda:
             action = np.random.choice(self.actions)
         return int(action)
 
-    def learn(self, _s, a, r, _s_, a_, extra_s, extra_state, is_done):
+    def learn(self, _s, extra_s, a, r, _s_, extra_state, is_done):
         reward_coefficient = 1
         virtual_done = False
         if is_done:
@@ -128,7 +128,7 @@ class SarsaLambda:
             # print(self.max_reward)
             # print(q_target)
         elif not is_done:
-            q_target = r + self.gamma * self.q_table_category[extra_state].loc[s_, a_]  # next state is not terminal
+            q_target = r + self.gamma * self.q_table_category[extra_state].loc[s_, :].max()  # next state is not terminal
         else:
             q_target = r  # next state is terminal
             reward_coefficient = self.check_max_reward(extra_s, q_target)
