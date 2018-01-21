@@ -8,27 +8,25 @@ import pandas as pd
 
 class VTable:
     
-    def __init__(self, max_steps, learning_rate_v, reward_decay, lambda_v):
+    def __init__(self, learning_rate_v, reward_decay, lambda_v):
 
         self.v = pd.DataFrame(columns=list(range(1)), dtype=np.float64)   # matrix of state v-values
         self.lr = learning_rate_v
         self.gamma = reward_decay
         self.lambda_v = lambda_v
-        self.max_steps = max_steps
-        self.traces = pd.DataFrame(columns=list(range(self.max_steps)), dtype=np.float64)              # matrix of eligibility traces
+        self.traces = pd.DataFrame(columns=list(range(1)), dtype=np.float64)              # matrix of eligibility traces
     
-    def update(self, s, r, s_, t, is_done):
+    def update(self, s, r, s_, is_done):
         self.check_state_exist(s)
         self.check_state_exist(s_)
         # update eligibility traces
-        if t > 1:
-            self.traces.ix[:, t] = self.gamma * self.lambda_v * self.traces.ix[:, t-1]
-        self.traces.ix[s, t] = self.traces.ix[s, t] + 1
+        self.traces.ix[s, 0] = self.traces.ix[s, 0] + 1
+        self.traces.ix[s_, 0] = self.gamma * self.lambda_v * self.traces.ix[s, 0]
         if not is_done:
             target_v = r + self.gamma * self.v.ix[s_, 0] - self.v.ix[s, 0]
         else:
             target_v = r - self.v.ix[s, 0]
-        self.v.ix[s, 0] = self.v.ix[s, 0] + self.lr * target_v * self.traces.ix[s, t]
+        self.v.ix[s, 0] = self.v.ix[s, 0] + self.lr * target_v * self.traces.ix[s, 0]
         return self
 
     def check_state_exist(self, state):
@@ -36,7 +34,7 @@ class VTable:
             # append new state to traces table
             self.traces = self.traces.append(
                 pd.Series(
-                    [0]*self.max_steps,
+                    [0]*1,
                     index=self.traces.columns,
                     name=state,
                 )

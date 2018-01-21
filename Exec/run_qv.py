@@ -35,7 +35,7 @@ def learning(epi, max_steps, time_in_ms, _is_render, QL, VL, env):
 
             # RL learn from this transition
             QL.learn(VL, current_state, action, reward, str(new_state), is_done)
-            VL.update(current_state, reward, str(new_state), step, is_done)
+            VL.update(current_state, reward, str(new_state), is_done)
 
             # swap observation
             agent = new_state
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     greedy = 0.85
     lambda_v = 0.6
     QLearner = QTable(actions, learning_rate_q, reward_gamma, greedy)
-    Vlearner = VTable(max_steps, learning_rate_v, reward_gamma, lambda_v)
+    Vlearner = VTable(learning_rate_v, reward_gamma, lambda_v)
 
     # run the simulation of training
     if is_render:
