@@ -1,7 +1,3 @@
-"""
-
-"""
-
 from MazeEnv.moderate_maze import MazeSimulator
 from LearningAlgos.Sarsa_lambda_RL import SarsaLambda
 import pandas as pd
@@ -145,7 +141,7 @@ if __name__ == "__main__":
     # env = MazeSimulator()
     # set if render the GUI
     is_render = False
-    is_demo = False
+    is_demo = True
     # set number of runs
     episodes = 600
     # animation interval
@@ -173,7 +169,7 @@ if __name__ == "__main__":
     learning_rate = 0.1
     reward_gamma = 0.95
     greedy = 0.45
-    lambda_val = 0.7
+    lambda_val = 0.6
     SLearner = SarsaLambda(actions, learning_rate, reward_gamma, greedy, lambda_val)
     SLearner.set_greedy_rule([0.9], episodes, 0.9)
 

@@ -1,10 +1,3 @@
-
-"""
-Reinforcement learning maze
-
-Please change the maze objects (e.g. walls, pits, chests, keys, exits in reset())
-"""
-
 import numpy as np
 import time
 import tkinter as tk
