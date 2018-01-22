@@ -1,4 +1,4 @@
-from MazeEnv.maze_layouts import MazeSmall, MazeLarge
+from MazeEnv.maze_layouts import MazeSmall, MazeLarge, MazeMedium
 from LearningAlgos.Sarsa_lambda_RL import SarsaLambda
 import pandas as pd
 import matplotlib
@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 # import matplotlib.pyplot as plt
 import time
 import csv
+import math
 
 
 def learning(epi, time_in_ms, _is_render, SL, env):
@@ -15,6 +16,7 @@ def learning(epi, time_in_ms, _is_render, SL, env):
     epo = []
     step_array = []
     training_time = time.time()
+    per_5 = math.floor(epi/20)
 
     for episode in range(epi):
         # initial observation
@@ -22,6 +24,10 @@ def learning(epi, time_in_ms, _is_render, SL, env):
         reward_in_epoch = 0
         init_time = time.time()
         step = 0
+
+        if episode%per_5 == 0:
+            print("{} %".format((episode/per_5)*5))
+            print()
 
         # initial observation
         agent, cond = env.reset()
@@ -156,7 +162,7 @@ def running(epi, time_in_ms, _is_render, SL, env):
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
-    is_demo = True
+    is_demo = False
     # set number of runs
     episodes = 1200
     # animation interval
@@ -171,6 +177,7 @@ if __name__ == "__main__":
         is_render = True
 
     # maze = MazeSmall(init_pos).init_maze(is_render)
+    # maze = MazeMedium(init_pos).init_maze(is_render)
     maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate SarsaLearner

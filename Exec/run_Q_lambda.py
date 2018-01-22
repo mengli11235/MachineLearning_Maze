@@ -1,4 +1,4 @@
-from MazeEnv.maze_layouts import MazeSmall, MazeLarge
+from MazeEnv.maze_layouts import MazeSmall, MazeLarge, MazeMedium
 from LearningAlgos.Q_lambda_RL import QLearningTable
 import pandas as pd
 import matplotlib
@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 # import matplotlib.pyplot as plt
 import time
 import csv
+import math
 
 
 def step_counter(_current_array=-1, _length=30):
@@ -30,6 +31,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     epo = []
     step_array = []
     training_time = time.time()
+    per_5 = math.floor(epi/20)
 
     for episode in range(epi):
         # initiate the agent
@@ -37,6 +39,10 @@ def learning(epi, time_in_ms, _is_render, QL, env):
         reward_in_each_epi = 0
         init_time = time.time()
         step = 0
+
+        if episode%per_5 == 0:
+            print("{} %".format((episode/per_5)*5))
+            print()
 
         # initial all zero eligibility trace
         QL.reset_trace()
@@ -67,7 +73,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
                 rewards.append(reward_in_each_epi)
                 time_array.append(format(time.time() - init_time, '.2f'))
                 step_array.append(step)
-                step_array = step_counter(step_array)
+                # step_array = step_counter(step_array)
                 # print(time_array)
                 epo.append(episode+1)
                 if _is_render:
@@ -170,6 +176,7 @@ if __name__ == "__main__":
         is_render = True
 
     # maze = MazeSmall(init_pos).init_maze(is_render)
+    # maze = MazeMedium(init_pos).init_maze(is_render)
     maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate QLearner

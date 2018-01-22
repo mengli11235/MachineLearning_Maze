@@ -1,5 +1,5 @@
 from LearningAlgos.QLearning_RL import QLearningTable
-from MazeEnv.maze_layouts import MazeSmall, MazeLarge
+from MazeEnv.maze_layouts import MazeSmall, MazeLarge, MazeMedium
 import pandas as pd
 import matplotlib
 matplotlib.use("TkAgg")
@@ -70,7 +70,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
                 rewards.append(reward_in_each_epi)
                 time_array.append(format(time.time() - init_time, '.2f'))
                 step_array.append(step)
-                step_array = step_counter(step_array)
+                # step_array = step_counter(step_array)
                 # print(time_array)
                 epo.append(episode+1)
                 if _is_render:
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 2100
+    episodes = 1500
     # animation interval
     interval = 0.005
 
@@ -172,6 +172,7 @@ if __name__ == "__main__":
         is_render = True
 
     # maze = MazeSmall(init_pos).init_maze(is_render)
+    # maze = MazeMedium(init_pos).init_maze(is_render)
     maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate QLearner
