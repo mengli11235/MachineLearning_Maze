@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 # import matplotlib.pyplot as plt
 import time
 import csv
+import math
 
 
 def step_counter(_current_array=-1, _length=30):
@@ -30,6 +31,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     epo = []
     step_array = []
     training_time = time.time()
+    per_5 = math.floor(epi/20)
 
     for episode in range(epi):
         # initiate the agent
@@ -37,6 +39,10 @@ def learning(epi, time_in_ms, _is_render, QL, env):
         reward_in_each_epi = 0
         init_time = time.time()
         step = 0
+
+        if episode%per_5 == 0:
+            print("{} %".format((episode/per_5)*5))
+            print()
 
         while True:
             # fresh env
@@ -81,6 +87,14 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     h, m = divmod(m, 60)
     print("Total training time: %d hr %02d min %02d sec" % (h, m, s))
 
+    qtable_keys = QL.q_table_category.keys()
+    with open('tmp_data/q_table_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
+        wr = csv.writer(f, quoting=csv.QUOTE_ALL)
+        wr.writerow(qtable_keys)
+    for key in qtable_keys:
+        QL.q_table_category[key].to_csv("tmp_data/temp_q_table_" + key + ".csv", sep=',', encoding='utf-8')
+        # print(QL.q_table_category[key])
+
     plt.figure(1)
     plt.plot(epo, rewards)
     plt.figure(2)
@@ -92,14 +106,6 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     if _is_render:
         time.sleep(1)
         env.destroy()
-
-    qtable_keys = QL.q_table_category.keys()
-    with open('tmp_data/q_table_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
-        wr = csv.writer(f, quoting=csv.QUOTE_ALL)
-        wr.writerow(qtable_keys)
-    for key in qtable_keys:
-        QL.q_table_category[key].to_csv("tmp_data/temp_q_table_" + key + ".csv", sep=',', encoding='utf-8')
-        # print(QL.q_table_category[key])
 
 
 def running(epi, time_in_ms, _is_render, QL, env):
@@ -153,7 +159,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 600
+    episodes = 2100
     # animation interval
     interval = 0.005
 

@@ -70,6 +70,14 @@ def learning(epi, time_in_ms, _is_render, SL, env):
     h, m = divmod(m, 60)
     print("Total training time: %d hr %02d min %02d sec" % (h, m, s))
 
+    sarsa_keys = SL.q_table_category.keys()
+    with open('tmp_data/sarsa_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
+        wr = csv.writer(f, quoting=csv.QUOTE_ALL)
+        wr.writerow(sarsa_keys)
+    for key in sarsa_keys:
+        SL.q_table_category[key].to_csv("tmp_data/temp_sarsa_table_" + key + ".csv", sep=',', encoding='utf-8')
+        print(SL.q_table_category[key])
+
     plt.figure(1)
     plt.plot(epo, rewards)
     plt.figure(2)
@@ -79,14 +87,6 @@ def learning(epi, time_in_ms, _is_render, SL, env):
     if _is_render:
         time.sleep(1)
         env.destroy()
-
-    sarsa_keys = SL.q_table_category.keys()
-    with open('tmp_data/sarsa_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
-        wr = csv.writer(f, quoting=csv.QUOTE_ALL)
-        wr.writerow(sarsa_keys)
-    for key in sarsa_keys:
-        SL.q_table_category[key].to_csv("tmp_data/temp_sarsa_table_" + key + ".csv", sep=',', encoding='utf-8')
-        print(SL.q_table_category[key])
 
 
 def running(epi, time_in_ms, _is_render, SL, env):
@@ -156,9 +156,9 @@ def running(epi, time_in_ms, _is_render, SL, env):
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
-    is_demo = False
+    is_demo = True
     # set number of runs
-    episodes = 600
+    episodes = 1200
     # animation interval
     interval = 0.005
 

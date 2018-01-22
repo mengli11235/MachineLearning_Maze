@@ -85,6 +85,14 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     h, m = divmod(m, 60)
     print("Total training time: %d hr %02d min %02d sec" % (h, m, s))
 
+    qtable_keys = QL.q_table_category.keys()
+    with open('tmp_data/q_lambda_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
+        wr = csv.writer(f, quoting=csv.QUOTE_ALL)
+        wr.writerow(qtable_keys)
+    for key in qtable_keys:
+        QL.q_table_category[key].to_csv("tmp_data/temp_q_lambda_" + key + ".csv", sep=',', encoding='utf-8')
+        # print(QL.q_table_category[key])
+
     plt.figure(1)
     plt.plot(epo, rewards)
     plt.figure(2)
@@ -96,14 +104,6 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     if _is_render:
         time.sleep(1)
         env.destroy()
-
-    qtable_keys = QL.q_table_category.keys()
-    with open('tmp_data/q_lambda_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
-        wr = csv.writer(f, quoting=csv.QUOTE_ALL)
-        wr.writerow(qtable_keys)
-    for key in qtable_keys:
-        QL.q_table_category[key].to_csv("tmp_data/temp_q_lambda_" + key + ".csv", sep=',', encoding='utf-8')
-        # print(QL.q_table_category[key])
 
 
 def running(epi, time_in_ms, _is_render, QL, env):
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of uns
-    episodes = 600
+    episodes = 1200
     # animation interval
     interval = 0.005
 
@@ -178,7 +178,7 @@ if __name__ == "__main__":
     reward_gamma = 0.95
     greedy = 0.4
     from_lambda_val = 0
-    to_lambda_val = 0
+    to_lambda_val = 0.4
     max_reward_coefficient = 0.75
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, from_lambda_val, to_lambda_val, max_reward_coefficient)
     QLearner.set_greedy_rule([0.9], episodes*0.9, 0.95)

@@ -40,16 +40,16 @@ class MazeLarge:
         maze.set_agent()
 
         for row in walls:
-            maze.set_wall(row, 0, False)
+            maze.set_wall(row, -3, False)
         for row in pits:
-            maze.set_fixed_obj(row, -3, False)
+            maze.set_fixed_obj(row, -15, False)
         for row in exits:
             # You might need to change set_fixed_obj() function if you change the reward for exit
-            maze.set_fixed_obj(row, 50, True)
+            maze.set_fixed_obj(row, 500, True)
 
         # set chest and its key
-        maze.set_key_chest([8, 18], [2, 5], '1', 0, 50)
-        maze.set_key_chest([14, 1], [4, 14], '2', 0, 50)
+        maze.set_key_chest([8, 18], [2, 5], '1', 0, 500)
+        # maze.set_key_chest([14, 1], [4, 14], '2', 0, 500)
 
         # build the rendered maze
         maze.build_maze()
