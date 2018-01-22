@@ -77,7 +77,7 @@ class MazeSimulator(tk.Tk, object):
                 x0, y0, x1, y1 = c, 0, c, self.grid_height * self.pixel
                 self.canvas.create_line(x0, y0, x1, y1)
             for r in range(0, self.grid_height * self.pixel, self.pixel):
-                x0, y0, x1, y1 = 0, r, self.grid_height * self.pixel, r
+                x0, y0, x1, y1 = 0, r, self.grid_width * self.pixel, r
                 self.canvas.create_line(x0, y0, x1, y1)
 
     def set_step_penalty(self, step_penalty):
