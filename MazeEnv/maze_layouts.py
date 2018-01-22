@@ -34,7 +34,7 @@ class MazeLarge:
 
         # set exit, with certain rewards
         exits = np.array(
-            [[13, 17]],
+            [[13, 18]],
             np.float64)
 
         maze.set_agent()
@@ -48,8 +48,9 @@ class MazeLarge:
             maze.set_fixed_obj(row, 500, True)
 
         # set chest and its key
-        maze.set_key_chest([8, 18], [2, 5], '1', 0, 500)
-        # maze.set_key_chest([14, 1], [4, 14], '2', 0, 500)
+        maze.set_key_chest([18, 18], [18, 0], '1', 0, 1500)
+        # maze.set_key_chest([2, 5], [8, 18], '2', 0, 1000)
+        # maze.set_key_chest([14, 1], [4, 14], '3', 0, 500)
 
         # build the rendered maze
         maze.build_maze()
@@ -139,7 +140,7 @@ class MazeSmall:
         maze.set_agent()
 
         for row in walls:
-            maze.set_wall(row, 0, False)
+            maze.set_wall(row, -3, False)
         for row in pits:
             maze.set_fixed_obj(row, -3, False)
         for row in exits:
