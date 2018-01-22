@@ -4,17 +4,18 @@ import math
 
 
 class QLearningTable:
-    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, trace_decay=0.9, max_reward_coefficient=0.9):
+    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, from_lambda_val=0.9, to_lambda_val=0.9, max_reward_coefficient=0.9):
         self.actions = actions  # a list
         self.lr = learning_rate
         self.gamma = reward_decay
         self.global_e_greedy = e_greedy
-        self.lambda_ = trace_decay
+        self.lambda_ = from_lambda_val if from_lambda_val <= 0.9 else 0.9
+        self.lambda_to = to_lambda_val if to_lambda_val <= 0.9 else 0.9
         self.greedy_dict = {}
         self.agent_extra_state = ""
         self.decay_count = 0
         self.max_reward = {}
-        self.max_reward_coefficient = max_reward_coefficient
+        self.max_reward_coefficient = 0.999 if max_reward_coefficient >= 1 else max_reward_coefficient
         self.q_table_category = {}
         self.eligibility_trace_category = {}
 
@@ -22,6 +23,7 @@ class QLearningTable:
         self.q_table_category[key] = df_qtable
 
     def set_greedy_rule(self, greedy_rate, episode, max_greedy):
+        self.episode = episode
         base = 1 - self.global_e_greedy
         target = 1 - max_greedy
         self.epoch_to_update = []
@@ -35,7 +37,10 @@ class QLearningTable:
 
     def update_episode(self, key):
         if key not in self.greedy_dict:
-            self.greedy_dict[key] = [1, self.global_e_greedy, self.epoch_to_update[self.decay_count], self.greedy_rate[self.decay_count]]
+            epo = self.epoch_to_update[self.decay_count]
+            rate = (self.lambda_to - self.lambda_)/math.floor(self.episode/epo)
+            self.greedy_dict[key] = [1, self.global_e_greedy, self.epoch_to_update[self.decay_count]
+                , self.greedy_rate[self.decay_count], self.lambda_, rate]
             if len(self.epoch_to_update) > self.decay_count + 1:
                 self.decay_count = self.decay_count + 1
         else:
@@ -43,17 +48,21 @@ class QLearningTable:
             epi = obj[0] + 1
             epsilon = obj[1]
             epoch_update = obj[2]
+            lam = obj[4]
             if epi != 0 and epi % epoch_update == 0 and epsilon != self.max_greedy:
                 greedy_rate = obj[3]
                 epsilon = 1 - (1 - epsilon) * greedy_rate
                 epsilon = self.max_greedy if epsilon > self.max_greedy else epsilon
+                lam = lam + obj[5]
                 print(key)
                 print(epi)
                 print(epsilon)
+                print(lam)
                 print()
                 # print(epsilon)
             self.greedy_dict[key][0] = epi
             self.greedy_dict[key][1] = epsilon
+            self.greedy_dict[key][4] = lam
 
     def check_state_exist(self, extra_state, state):
         if extra_state not in self.q_table_category:
@@ -95,7 +104,7 @@ class QLearningTable:
         # action selection
         if np.random.uniform() < epsilon:
             # choose best action
-            state_action = self.q_table_category[extra_state].loc[observation, :]
+            state_action = self.q_table_category[extra_state].ix[observation, :]
             # when actions have the same value
             state_action = state_action.reindex(np.random.permutation(state_action.index))
             action = state_action.idxmax()
@@ -119,7 +128,7 @@ class QLearningTable:
         s_ = str(_s_)
 
         self.check_state_exist(extra_state, s_)
-        q_predict = self.q_table_category[extra_s].loc[s, a]
+        q_predict = self.q_table_category[extra_s].ix[s, a]
 
         if virtual_done:
             next_expectation = 0 if extra_state not in self.max_reward else self.max_reward[extra_state]
@@ -128,7 +137,7 @@ class QLearningTable:
             # print(self.max_reward)
             # print(q_target)
         elif not is_done:
-            q_target = r + self.gamma * self.q_table_category[extra_state].loc[s_, :].max()  # next state is not terminal
+            q_target = r + self.gamma * self.q_table_category[extra_state].ix[s_, :].max()  # next state is not terminal
         else:
             q_target = r  # next state is terminal
             reward_coefficient = self.check_max_reward(extra_s, q_target)
@@ -137,14 +146,20 @@ class QLearningTable:
 
         eligibility = self.eligibility_trace_category[extra_s]
 
-        # eligibility.loc[s, :] *= 0
-        eligibility.loc[s, a] += 1
+        eligibility.ix[s, :] *= 0
+        eligibility.ix[s, a] += 1
 
         # update Q table
-        self.q_table_category[extra_s] += 1 * self.lr * error * eligibility * reward_coefficient
+        temp = 1 * self.lr * error * eligibility * reward_coefficient
+        if temp.ix[s, a] > 9999:
+            stop = "here"
+        self.q_table_category[extra_s] += temp
 
         # decay eligibility trace after update
-        eligibility *= self.gamma * self.lambda_
+        lambda_try = self.greedy_dict[extra_s][4]
+        # print(lambda_try)
+        # eligibility *= self.gamma * self.lambda_
+        eligibility *= self.gamma * lambda_try
 
         self.eligibility_trace_category[extra_s] = eligibility
 
@@ -162,8 +177,7 @@ class QLearningTable:
             max_val = self.max_reward[state_key]
             max_reward_coefficient = self.max_reward_coefficient
             if max_val > r:
-                max_reward_coefficient = 0.999 if max_reward_coefficient >= 1 else max_reward_coefficient
-                std_unit = max_reward_coefficient * (1 - max_reward_coefficient) * 1000
+                std_unit = max_reward_coefficient * (1 - max_reward_coefficient) * max_val
                 se = (r - max_val * max_reward_coefficient) / std_unit
                 return se
             else:
