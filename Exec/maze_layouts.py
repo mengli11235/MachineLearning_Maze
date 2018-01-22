@@ -1,5 +1,5 @@
 import numpy as np
-from MazeEnv.moderate_maze import MazeSimulator
+from MazeEnv.maze_env import MazeSimulator
 
 
 class MazeLarge:
@@ -11,17 +11,43 @@ class MazeLarge:
     def init_maze(self, is_render):
         maze = MazeSimulator(self.size_maze[1], self.size_maze[0], self.init_pos, is_render)
 
+        # the cost of each move
         maze.set_step_penalty(-1)
 
-        # set fixed object ([column, row], reward, isFinishedWhenReach)
-        maze.set_fixed_obj([8, 8], -1000, False)
-        maze.set_key_chest([7, 5], [2, 17], 'k', 600, 1000)
-        maze.set_key_chest([19, 15], [0, 0], 'k2', 0, 600)
-        maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
+        # set walls
+        walls = np.array(
+            [[5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [11, 2], [10, 2], [12, 2], [8, 0], [8, 1],  # NO1
+             [16, 0], [16, 1], [16, 2], [16, 3], [16, 4], [16, 5],  # NO2
+             [3, 6], [3, 7], [3, 8], [3, 9], [3, 10], [3, 11], [0, 9], [1, 9], [2, 9],  # NO3
+             [7, 13], [7, 14], [7, 15], [7, 16],  # NO4
+             [0, 17], [1, 17], [2, 17], [3, 17], [4, 17], [5, 17], [6, 17], [7, 17],
+             [10, 6], [10, 7], [10, 8], [10, 9], [10, 10], [11, 10], [12, 10], [13, 10],  # NO5
+             [16, 13], [16, 14], [16, 15], [16, 16], [16, 17],  # NO6
+             [11, 15], [12, 15], [13, 15], [14, 15], [15, 15],
+             [11, 16], [11, 17], [11, 18], [11, 19]],
+            np.float64)
 
-        # maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
-        # maze.set_key_chest([3, 3], [18, 15], 'key2', 0, 800)
-        # maze.set_key_chest([2, 14], [18, 4], 'key3', 0, 1000)
+        # set pits (extra cost when stepping on it)
+        pits = np.array(
+            [[8, 9], [15, 7]],
+            np.float64)
+
+        # set exit, with certain rewards
+        exits = np.array(
+            [[13, 17]],
+            np.float64)
+
+        maze.set_agent()
+
+        for row in walls:
+            maze.set_wall(row, 0, False)
+        for row in pits:
+            maze.set_fixed_obj(row, -3, False)
+        for row in exits:
+            # You might need to change set_fixed_obj() function if you change the reward for exit
+            maze.set_fixed_obj(row, 400, True)
+
+        maze.set_key_chest([0, 5], [8, 5], 'k', 0, 600)
 
         # build the rendered maze
         maze.build_maze()

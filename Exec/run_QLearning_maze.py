@@ -1,4 +1,3 @@
-from MazeEnv.moderate_maze import MazeSimulator
 from LearningAlgos.QLearning_RL import QLearningTable
 from maze_layouts import MazeSmall, MazeLarge
 import pandas as pd
@@ -165,7 +164,8 @@ if __name__ == "__main__":
     if is_demo:
         is_render = True
 
-    maze = MazeSmall(init_pos).init_maze(is_render)
+    # maze = MazeSmall(init_pos).init_maze(is_render)
+    maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate QLearner
     actions = list(range(maze.n_actions))

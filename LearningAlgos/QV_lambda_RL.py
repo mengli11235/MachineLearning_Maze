@@ -4,42 +4,53 @@ import pandas as pd
 
 class VTable:
     
-    def __init__(self, actions, reward_decay, alphaW=.1, alphaV=.1, beta=2):
+    def __init__(self, max_steps, learning_rate_v, reward_decay, lambda_v):
 
-        self.actions = actions
-        #self.v = np.random.randint(5, size=(world.n, world.m))
-        self.v = pd.DataFrame(columns=self.actions, dtype=np.float64)   # matrix of state-actions values
-        self.alphaW = alphaW                    # learning rate for w
-        self.alphaV = alphaV                    # learning rate for v
-        self.beta = beta
+        self.v = pd.DataFrame(columns=list(range(1)), dtype=np.float64)   # matrix of state v-values
+        self.lr = learning_rate_v
         self.gamma = reward_decay
-        self.w = np.zeros(self.q_table.shape[0])      # vector of conditioned reinforcement values, one for each state
-        
-    def probabilities(self, states):
-        p = pd.DataFrame(columns=self.actions, dtype=np.float64)
-        for s in range(states):
-            initial = np.array((self.v[s, :] * self.beta))
-            vexp = np.exp(initial)  # vector of exponents
-            vexp = vexp/sum(vexp)
-            p[s] = vexp
-
-        return p
+        self.lambda_v = lambda_v
+        self.max_steps = max_steps
+        self.traces = pd.DataFrame(columns=list(range(self.max_steps)), dtype=np.float64)              # matrix of eligibility traces
     
-    def action(self, states, state):
-        pm = self.probabilities(states)
-        pr = pm[state]
-        print(self.v)
-        choice = np.random.choice(self.v[state, :], p=pr)
-        return self.v[state, :].tolist().index(choice)
-    
-    def learning(self, fromState, action, toState, world):
-        totreward = world.values[toState] + self.w[toState]
-        deltaV = self.alphaV * (totreward - self.v[fromState, action])
-        self.v[fromState, action] += deltaV
+    def update(self, s, r, s_, t, is_done):
+        self.check_state_exist(s)
+        self.check_state_exist(s_)
+        # update eligibility traces
+        if t > 1:
+            self.traces.ix[:, t] = self.gamma * self.lambda_v * self.traces.ix[:, t-1]
+        self.traces.ix[s, t] = self.traces.ix[s, t] + 1
+        if not is_done:
+            target_v = r + self.gamma * self.v.ix[s_, 0] - self.v.ix[s, 0]
+        else:
+            target_v = r - self.v.ix[s, 0]
+        self.v.ix[s, 0] = self.v.ix[s, 0] + self.lr * target_v * self.traces.ix[s, t]
         return self
+
+    def check_state_exist(self, state):
+        if state not in self.traces.index:
+            # append new state to traces table
+            self.traces = self.traces.append(
+                pd.Series(
+                    [0]*self.max_steps,
+                    index=self.traces.columns,
+                    name=state,
+                )
+            )
+
+        if state not in self.v.index:
+            # append new state to v table
+            self.v = self.v.append(
+                pd.Series(
+                    [0] * 1,
+                    index=self.v.columns,
+                    name=state,
+                )
+            )
 
 
 class QTable:
+
     def __init__(self, actions, learning_rate, reward_decay, e_greedy):
         self.actions = actions  # a list
         self.lr = learning_rate
@@ -64,11 +75,12 @@ class QTable:
             action = np.random.choice(self.actions)
         return int(action)
 
-    def learn(self, s, a, r, s_, is_done):
+    def learn(self, v_table, s, a, r, s_, is_done):
         self.check_state_exist(s_)
+        v_table.check_state_exist(s_)
         q_predict = self.q_table.ix[s, a]
         if not is_done:
-            q_target = r + self.gamma * self.q_table.ix[s_, :].max()  # next state is not terminal
+            q_target = r + self.gamma * v_table.v.ix[s_, 0]  # next state is not terminal
         else:
             q_target = r  # next state is terminal
         self.q_table.ix[s, a] += self.lr * (q_target - q_predict)  # update
@@ -81,4 +93,5 @@ class QTable:
                     [0]*len(self.actions),
                     index=self.q_table.columns,
                     name=state,
-                ))
+                )
+            )

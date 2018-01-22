@@ -1,10 +1,3 @@
-
-"""
-Reinforcement learning maze
-
-Please change the maze objects (e.g. walls, pits, chests, keys, exits in reset())
-"""
-
 import numpy as np
 import time
 import tkinter as tk
@@ -36,30 +29,7 @@ class MazeSimulator(tk.Tk, object):
         self.available_action = ['^', 'v', '<', '>']
         self.n_actions = len(self.available_action)
 
-        walls = np.array(
-            [[3, 9], [3, 10], [3, 11], [3, 12], [3, 13],
-             [6, 4], [6, 5], [6, 6], [6, 7], [6, 8],
-             [9, 9], [9, 10], [9, 11], [9, 12], [9, 13],
-             [12, 4], [12, 5], [12, 6], [12, 7], [12, 8],
-             [15, 9], [15, 10], [15, 11], [15, 12], [15, 13]],
-            np.float64)
-
-        pits = np.array(
-            [[2, 3], [10, 9]],
-            np.float64)
-        exits = np.array(
-            [[18, 1]],
-            np.float64)
-
         self._init_grid()
-        self.set_agent()
-        for row in walls:
-            self.set_wall(row, 0, False)
-        for row in pits:
-            self.set_fixed_obj(row, -3, False)
-        for row in exits:
-            # You might need to change set_fixed_obj() function if you change the reward for exit
-            self.set_fixed_obj(row, 400, True)
 
         if self.is_render:
             self.update()
@@ -157,7 +127,15 @@ class MazeSimulator(tk.Tk, object):
         # self.agent_con_map = {}
         self.object_list = self.final_object_list[:]
         self.agent_keys = []
+
         self.agent_chests = []
+
+        # if self.is_render:
+        #     for obj in self.key_list:
+        #         self.canvas.delete(obj[3])
+        #     for obj in self.chest_list:
+        #         self.canvas.delete(obj[3])
+
         self.key_list = []
         self.chest_list = []
 
@@ -224,7 +202,7 @@ class MazeSimulator(tk.Tk, object):
         if len(collide_walls) > 0:
             new_state = np.array([self.agent[0], self.agent[1]])
             new_condition = self.print_list(self.agent_keys) + "_" + self.print_list(self.agent_chests)
-            return new_state, new_condition, -3, False
+            return new_state, new_condition, self.step_penalty*3, False
 
         if has_hit_border:
             new_state = np.array([self.agent[0], self.agent[1]])

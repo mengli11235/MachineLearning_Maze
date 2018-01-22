@@ -143,7 +143,7 @@ def running(epi, time_in_ms, _is_render, SL, env):
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
-    is_demo = True
+    is_demo = False
     # set number of runs
     episodes = 2100
     # animation interval
@@ -162,10 +162,11 @@ if __name__ == "__main__":
     maze.set_step_penalty(-1)
 
     # set fixed object ([column, row], reward, isFinishedWhenReach)
-    maze.set_fixed_obj([8, 8], -1000, False)
-    maze.set_key_chest([7, 5], [2, 17], 'k', 600, 1000)
-    maze.set_key_chest([19, 15], [0, 0], 'k2', 0, 600)
-    maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
+    # maze.set_fixed_obj([8, 8], -1000, False)
+
+    maze.set_key_chest([9, 18], [6, 6], 'k', 600, 1000)
+    # maze.set_key_chest([19, 15], [0, 0], 'k2', 0, 600)
+    # maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
 
     # maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
     # maze.set_key_chest([3, 3], [18, 15], 'key2', 0, 800)
@@ -178,6 +179,7 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.95
+
     greedy = 0.4
     lambda_val = 0.6
     max_reward_coefficient = 0.75
