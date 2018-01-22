@@ -82,7 +82,7 @@ def learning(epi, time_in_ms, _is_render, SL, env):
         wr.writerow(sarsa_keys)
     for key in sarsa_keys:
         SL.q_table_category[key].to_csv("tmp_data/temp_sarsa_table_" + key + ".csv", sep=',', encoding='utf-8')
-        print(SL.q_table_category[key])
+        # print(SL.q_table_category[key])
 
     plt.figure(1)
     plt.plot(epo, rewards)
@@ -186,8 +186,8 @@ if __name__ == "__main__":
     reward_gamma = 0.95
 
     greedy = 0.4
-    lambda_val = 0
-    # lambda_val = 0.5
+    # lambda_val = 0
+    lambda_val = 0.5
     max_reward_coefficient = 0.75
     SLearner = SarsaLambda(actions, learning_rate, reward_gamma, greedy, lambda_val, max_reward_coefficient)
     SLearner.set_greedy_rule([0.9], episodes*0.9, 0.95)
