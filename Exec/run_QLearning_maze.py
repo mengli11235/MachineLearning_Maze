@@ -1,5 +1,6 @@
 from MazeEnv.moderate_maze import MazeSimulator
 from LearningAlgos.QLearning_RL import QLearningTable
+from maze_layouts import MazeSmall, MazeLarge
 import pandas as pd
 import matplotlib
 matplotlib.use("TkAgg")
@@ -152,11 +153,10 @@ if __name__ == "__main__":
     is_render = False
     is_demo = True
     # set number of runs
-    episodes = 2100
+    episodes = 300
     # animation interval
     interval = 0.005
-    # set the size of maze: column x row
-    size_maze = [20, 20]
+
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
@@ -164,22 +164,8 @@ if __name__ == "__main__":
     # initiate maze simulator for learning and running
     if is_demo:
         is_render = True
-    maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
 
-    maze.set_step_penalty(-1)
-
-    # set fixed object ([column, row], reward, isFinishedWhenReach)
-    maze.set_fixed_obj([8, 8], -1000, False)
-    maze.set_key_chest([7, 5], [2, 17], 'k', 600, 1000)
-    maze.set_key_chest([19, 15], [0, 0], 'k2', 0, 600)
-    maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
-
-    # maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
-    # maze.set_key_chest([3, 3], [18, 15], 'key2', 0, 800)
-    # maze.set_key_chest([2, 14], [18, 4], 'key3', 0, 1000)
-
-    # build the rendered maze
-    maze.build_maze()
+    maze = MazeSmall(init_pos).init_maze(is_render)
 
     # initiate QLearner
     actions = list(range(maze.n_actions))
