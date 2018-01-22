@@ -1,4 +1,4 @@
-from MazeEnv.moderate_maze import MazeSimulator
+from MazeEnv.maze_layouts import MazeSmall, MazeLarge, MazeMedium
 from LearningAlgos.Sarsa_lambda_RL import SarsaLambda
 import pandas as pd
 import matplotlib
@@ -7,18 +7,27 @@ from matplotlib import pyplot as plt
 # import matplotlib.pyplot as plt
 import time
 import csv
+import math
 
 
 def learning(epi, time_in_ms, _is_render, SL, env):
     rewards = []
     time_array = []
     epo = []
+    step_array = []
+    training_time = time.time()
+    per_5 = math.floor(epi/20)
 
     for episode in range(epi):
         # initial observation
         # observation = env.reset()
         reward_in_epoch = 0
         init_time = time.time()
+        step = 0
+
+        if episode%per_5 == 0:
+            print("{} %".format((episode/per_5)*5))
+            print()
 
         # initial observation
         agent, cond = env.reset()
@@ -48,18 +57,24 @@ def learning(epi, time_in_ms, _is_render, SL, env):
             cond = new_cond
             action = action_
 
+            # count step
+            step = step + 1
+
             # break while loop when end of this episode
             if is_done:
                 rewards.append(reward_in_epoch)
                 time_array.append(format(time.time()-init_time, '.2f'))
+                step_array.append(step)
                 epo.append(episode + 1)
                 break
 
     # end of game
-    print('game over, total rewards gained for each epoch:')
-    print(rewards)
-    print('time (in sec) spent over epochs:')
-    print(time_array)
+    print('game over')
+    # print training time
+    training_time = time.time() - training_time
+    m, s = divmod(training_time, 60)
+    h, m = divmod(m, 60)
+    print("Total training time: %d hr %02d min %02d sec" % (h, m, s))
 
     sarsa_keys = SL.q_table_category.keys()
     with open('tmp_data/sarsa_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
@@ -69,11 +84,15 @@ def learning(epi, time_in_ms, _is_render, SL, env):
         SL.q_table_category[key].to_csv("tmp_data/temp_sarsa_table_" + key + ".csv", sep=',', encoding='utf-8')
         print(SL.q_table_category[key])
 
-    if is_render:
-        env.destroy()
-
+    plt.figure(1)
     plt.plot(epo, rewards)
+    plt.figure(2)
+    plt.plot(epo, step_array)
     plt.show()
+
+    if _is_render:
+        time.sleep(1)
+        env.destroy()
 
 
 def running(epi, time_in_ms, _is_render, SL, env):
@@ -145,11 +164,10 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 2100
+    episodes = 1200
     # animation interval
     interval = 0.005
-    # set the size of maze: column x row
-    size_maze = [20, 20]
+
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
@@ -157,23 +175,10 @@ if __name__ == "__main__":
     # initiate maze simulator for learning and running
     if is_demo:
         is_render = True
-    maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
 
-    maze.set_step_penalty(-1)
-
-    # set fixed object ([column, row], reward, isFinishedWhenReach)
-    # maze.set_fixed_obj([8, 8], -1000, False)
-
-    maze.set_key_chest([9, 18], [6, 6], 'k', 600, 1000)
-    # maze.set_key_chest([19, 15], [0, 0], 'k2', 0, 600)
-    # maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
-
-    # maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
-    # maze.set_key_chest([3, 3], [18, 15], 'key2', 0, 800)
-    # maze.set_key_chest([2, 14], [18, 4], 'key3', 0, 1000)
-
-    # build the rendered maze
-    maze.build_maze()
+    # maze = MazeSmall(init_pos).init_maze(is_render)
+    # maze = MazeMedium(init_pos).init_maze(is_render)
+    maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate SarsaLearner
     actions = list(range(maze.n_actions))
@@ -181,7 +186,8 @@ if __name__ == "__main__":
     reward_gamma = 0.95
 
     greedy = 0.4
-    lambda_val = 0.6
+    lambda_val = 0
+    # lambda_val = 0.5
     max_reward_coefficient = 0.75
     SLearner = SarsaLambda(actions, learning_rate, reward_gamma, greedy, lambda_val, max_reward_coefficient)
     SLearner.set_greedy_rule([0.9], episodes*0.9, 0.95)

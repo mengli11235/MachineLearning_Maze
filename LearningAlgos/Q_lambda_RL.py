@@ -151,8 +151,6 @@ class QLearningTable:
 
         # update Q table
         temp = 1 * self.lr * error * eligibility * reward_coefficient
-        if temp.ix[s, a] > 9999:
-            stop = "here"
         self.q_table_category[extra_s] += temp
 
         # decay eligibility trace after update

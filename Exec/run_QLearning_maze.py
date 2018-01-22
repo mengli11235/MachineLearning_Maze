@@ -1,5 +1,5 @@
-from MazeEnv.maze_env import MazeSimulator
 from LearningAlgos.QLearning_RL import QLearningTable
+from MazeEnv.maze_layouts import MazeSmall, MazeLarge, MazeMedium
 import pandas as pd
 import matplotlib
 matplotlib.use("TkAgg")
@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 # import matplotlib.pyplot as plt
 import time
 import csv
+import math
 
 
 def step_counter(_current_array=-1, _length=30):
@@ -30,6 +31,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     epo = []
     step_array = []
     training_time = time.time()
+    per_5 = math.floor(epi/20)
 
     for episode in range(epi):
         # initiate the agent
@@ -37,6 +39,10 @@ def learning(epi, time_in_ms, _is_render, QL, env):
         reward_in_each_epi = 0
         init_time = time.time()
         step = 0
+
+        if episode%per_5 == 0:
+            print("{} %".format((episode/per_5)*5))
+            print()
 
         while True:
             # fresh env
@@ -64,7 +70,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
                 rewards.append(reward_in_each_epi)
                 time_array.append(format(time.time() - init_time, '.2f'))
                 step_array.append(step)
-                step_array = step_counter(step_array)
+                # step_array = step_counter(step_array)
                 # print(time_array)
                 epo.append(episode+1)
                 if _is_render:
@@ -80,9 +86,6 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     m, s = divmod(training_time, 60)
     h, m = divmod(m, 60)
     print("Total training time: %d hr %02d min %02d sec" % (h, m, s))
-    if _is_render:
-        time.sleep(1)
-        env.destroy()
 
     qtable_keys = QL.q_table_category.keys()
     with open('tmp_data/q_table_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
@@ -91,14 +94,18 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     for key in qtable_keys:
         QL.q_table_category[key].to_csv("tmp_data/temp_q_table_" + key + ".csv", sep=',', encoding='utf-8')
         # print(QL.q_table_category[key])
+
     plt.figure(1)
     plt.plot(epo, rewards)
     plt.figure(2)
     plt.plot(epo, step_array)
     # plt.figure(3)
     # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
-
     plt.show()
+
+    if _is_render:
+        time.sleep(1)
+        env.destroy()
 
 
 def running(epi, time_in_ms, _is_render, QL, env):
@@ -151,13 +158,20 @@ if __name__ == "__main__":
     # set if render the GUI
     is_render = False
     is_demo = False
+<<<<<<< HEAD
 
+=======
+>>>>>>> a18b924a1b4513b0762248a398f3585fe9ae96a3
     # set number of runs
-    episodes = 2100
+    episodes = 1500
     # animation interval
     interval = 0.005
+<<<<<<< HEAD
     # set the size of maze: column x row
     size_maze = [12, 12]
+=======
+
+>>>>>>> a18b924a1b4513b0762248a398f3585fe9ae96a3
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
@@ -165,6 +179,7 @@ if __name__ == "__main__":
     # initiate maze simulator for learning and running
     if is_demo:
         is_render = True
+<<<<<<< HEAD
     maze = MazeSimulator(size_maze[1], size_maze[0], init_pos, is_render)
 
     maze.set_step_penalty(-1)
@@ -180,9 +195,12 @@ if __name__ == "__main__":
     # maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
     # maze.set_key_chest([3, 3], [18, 15], 'key2', 0, 800)
     # maze.set_key_chest([2, 14], [18, 4], 'key3', 0, 1000)
+=======
+>>>>>>> a18b924a1b4513b0762248a398f3585fe9ae96a3
 
-    # build the rendered maze
-    maze.build_maze()
+    # maze = MazeSmall(init_pos).init_maze(is_render)
+    # maze = MazeMedium(init_pos).init_maze(is_render)
+    maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate QLearner
     actions = list(range(maze.n_actions))

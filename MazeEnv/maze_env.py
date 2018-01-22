@@ -29,6 +29,7 @@ class MazeSimulator(tk.Tk, object):
         self.available_action = ['^', 'v', '<', '>']
         self.n_actions = len(self.available_action)
 
+<<<<<<< HEAD
         walls = np.array(
             [[3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [5, 0],
              [9, 0], [9, 1], [9, 2], [9, 3],
@@ -53,15 +54,9 @@ class MazeSimulator(tk.Tk, object):
             [[8, 11]],
             np.float64)
 
+=======
+>>>>>>> a18b924a1b4513b0762248a398f3585fe9ae96a3
         self._init_grid()
-        self.set_agent()
-        for row in walls:
-            self.set_wall(row, 0, False)
-        for row in pits:
-            self.set_fixed_obj(row, -1000, False)
-        for row in exits:
-            # You might need to change set_fixed_obj() function if you change the reward for exit
-            self.set_fixed_obj(row, 400, True)
 
         if self.is_render:
             self.update()
@@ -79,7 +74,7 @@ class MazeSimulator(tk.Tk, object):
                 x0, y0, x1, y1 = c, 0, c, self.grid_height * self.pixel
                 self.canvas.create_line(x0, y0, x1, y1)
             for r in range(0, self.grid_height * self.pixel, self.pixel):
-                x0, y0, x1, y1 = 0, r, self.grid_height * self.pixel, r
+                x0, y0, x1, y1 = 0, r, self.grid_width * self.pixel, r
                 self.canvas.create_line(x0, y0, x1, y1)
 
     def set_step_penalty(self, step_penalty):
@@ -178,13 +173,13 @@ class MazeSimulator(tk.Tk, object):
                 key_obj = self.origin_coord + np.array([self.pixel * key_position[0], self.pixel * key_position[1]])
                 key_coordinates = self.canvas.create_text(
                     key_obj[0], key_obj[1],
-                    fill='black', text="key")
+                    fill='black', text=key+"-key")
 
                 chest_obj = self.origin_coord + np.array(
                     [self.pixel * reward_position[0], self.pixel * reward_position[1]])
                 chest_coordinates = self.canvas.create_text(
                     chest_obj[0], chest_obj[1],
-                    fill='black', text="chest")
+                    fill='black', text=key+"-chest")
 
             self.key_list.append([key_position, key, key_reward, chest_reward, key_coordinates])
             self.chest_list.append([reward_position, key, 0, chest_coordinates])
@@ -234,7 +229,7 @@ class MazeSimulator(tk.Tk, object):
         if len(collide_walls) > 0:
             new_state = np.array([self.agent[0], self.agent[1]])
             new_condition = self.print_list(self.agent_keys) + "_" + self.print_list(self.agent_chests)
-            return new_state, new_condition, -3, False
+            return new_state, new_condition, collide_walls[0][1], False
 
         if has_hit_border:
             new_state = np.array([self.agent[0], self.agent[1]])
