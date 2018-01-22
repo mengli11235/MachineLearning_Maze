@@ -30,18 +30,22 @@ class MazeSimulator(tk.Tk, object):
         self.n_actions = len(self.available_action)
 
         walls = np.array(
-            [[3, 9], [3, 10], [3, 11], [3, 12], [3, 13],
-             [6, 4], [6, 5], [6, 6], [6, 7], [6, 8],
-             [9, 9], [9, 10], [9, 11], [9, 12], [9, 13],
-             [12, 4], [12, 5], [12, 6], [12, 7], [12, 8],
-             [15, 9], [15, 10], [15, 11], [15, 12], [15, 13]],
+            [[5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [11, 2], [10, 2], [12, 2], [8, 0], [8, 1],  # NO1
+             [16, 0], [16, 1], [16, 2], [16, 3], [16, 4], [16, 5],  # NO2
+             [3, 6], [3, 7], [3, 8], [3, 9], [3, 10], [3, 11], [0, 9], [1, 9], [2, 9],  # NO3
+             [7, 13], [7, 14], [7, 15], [7, 16],  # NO4
+             [0, 17], [1, 17], [2, 17], [3, 17], [4, 17], [5, 17], [6, 17], [7, 17],
+             [10, 6], [10, 7], [10, 8], [10, 9], [10, 10], [11, 10], [12, 10], [13, 10],  # NO5
+             [16, 13], [16, 14], [16, 15], [16, 16], [16, 17],  # NO6
+             [11, 15], [12, 15], [13, 15], [14, 15], [15, 15],
+             [11, 16], [11, 17], [11, 18], [11, 19]],
             np.float64)
 
         pits = np.array(
-            [[2, 3], [10, 9]],
+            [[8, 9], [15, 7]],
             np.float64)
         exits = np.array(
-            [[18, 1]],
+            [[13, 17]],
             np.float64)
 
         self._init_grid()
@@ -49,7 +53,7 @@ class MazeSimulator(tk.Tk, object):
         for row in walls:
             self.set_wall(row, 0, False)
         for row in pits:
-            self.set_fixed_obj(row, -3, False)
+            self.set_fixed_obj(row, -1000, False)
         for row in exits:
             # You might need to change set_fixed_obj() function if you change the reward for exit
             self.set_fixed_obj(row, 400, True)
@@ -150,7 +154,15 @@ class MazeSimulator(tk.Tk, object):
         # self.agent_con_map = {}
         self.object_list = self.final_object_list[:]
         self.agent_keys = []
+
         self.agent_chests = []
+
+        # if self.is_render:
+        #     for obj in self.key_list:
+        #         self.canvas.delete(obj[3])
+        #     for obj in self.chest_list:
+        #         self.canvas.delete(obj[3])
+
         self.key_list = []
         self.chest_list = []
 

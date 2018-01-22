@@ -1,4 +1,4 @@
-from MazeEnv.moderate_maze import MazeSimulator
+from MazeEnv.maze_env import MazeSimulator
 from LearningAlgos.QLearning_RL import QLearningTable
 import pandas as pd
 import matplotlib
@@ -148,10 +148,10 @@ if __name__ == "__main__":
     maze.set_step_penalty(-1)
 
     # set fixed object ([column, row], reward, isFinishedWhenReach)
-    maze.set_fixed_obj([8, 8], -1000, False)
-    maze.set_key_chest([7, 5], [2, 17], 'k', 600, 1000)
-    maze.set_key_chest([19, 15], [0, 0], 'k2', 0, 600)
-    maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
+    # maze.set_fixed_obj([8, 8], -1000, False)
+    maze.set_key_chest([8, 18], [2, 5], 'k', 600, 1000)
+    maze.set_key_chest([14, 1], [4, 14], 'k2', 0, 600)
+    # maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
 
     # maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
     # maze.set_key_chest([3, 3], [18, 15], 'key2', 0, 800)
