@@ -150,13 +150,14 @@ def running(epi, time_in_ms, _is_render, QL, env):
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
-    is_demo = True
+    is_demo = False
+
     # set number of runs
     episodes = 2100
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
-    size_maze = [20, 20]
+    size_maze = [12, 12]
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
@@ -170,8 +171,10 @@ if __name__ == "__main__":
 
     # set fixed object ([column, row], reward, isFinishedWhenReach)
     # maze.set_fixed_obj([8, 8], -1000, False)
-    maze.set_key_chest([8, 18], [2, 5], 'k', 600, 1000)
-    maze.set_key_chest([14, 1], [4, 14], 'k2', 0, 600)
+
+    maze.set_key_chest([1, 11], [8, 0], '1', 600, 1000)
+    # maze.set_key_chest([14, 1], [4, 14], 'k2', 0, 600)
+
     # maze.set_key_chest([10, 18], [0, 3], 'w', 0, 600)
 
     # maze.set_key_chest([19, 15], [0, 0], 'key', 0, 600)
