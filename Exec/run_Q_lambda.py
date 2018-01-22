@@ -9,11 +9,27 @@ import time
 import csv
 
 
+def step_counter(_current_array=-1, _length=30):
+    if _current_array == -1:
+        return _current_array
+    else:
+        _sum = 0
+        if len(_current_array) >= _length:
+            start_index = len(_current_array) - _length
+            for x in range(0, _length):
+                _sum += _current_array[start_index + x]
+            new_mean = _sum/_length
+            _current_array[start_index] = new_mean
+            return _current_array
+        return _current_array
+
+
 def learning(epi, time_in_ms, _is_render, QL, env):
     rewards = []
     time_array = []
     epo = []
     step_array = []
+    training_time = time.time()
 
     for episode in range(epi):
         # initiate the agent
@@ -51,6 +67,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
                 rewards.append(reward_in_each_epi)
                 time_array.append(format(time.time() - init_time, '.2f'))
                 step_array.append(step)
+                step_array = step_counter(step_array)
                 # print(time_array)
                 epo.append(episode+1)
                 if _is_render:
@@ -62,6 +79,10 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
     # end of game
     print('game over')
+    training_time = time.time() - training_time
+    m, s = divmod(training_time, 60)
+    h, m = divmod(m, 60)
+    print("Total training time: %d hr %02d min %02d sec" % (h, m, s))
     if _is_render:
         time.sleep(1)
         env.destroy()
@@ -72,11 +93,11 @@ def learning(epi, time_in_ms, _is_render, QL, env):
         wr.writerow(qtable_keys)
     for key in qtable_keys:
         QL.q_table_category[key].to_csv("tmp_data/temp_q_lambda_" + key + ".csv", sep=',', encoding='utf-8')
-        print(QL.q_table_category[key])
+        # print(QL.q_table_category[key])
     plt.figure(1)
     plt.plot(epo, rewards)
-    # plt.figure(2)
-    # plt.plot(epo, step_array)
+    plt.figure(2)
+    plt.plot(epo, step_array)
     # plt.figure(3)
     # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
 
@@ -132,9 +153,9 @@ def running(epi, time_in_ms, _is_render, QL, env):
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
-    is_demo = False
-    # set number of runs
-    episodes = 2100
+    is_demo = True
+    # set number of uns
+    episodes = 1200
     # animation interval
     interval = 0.005
     # set the size of maze: column x row
@@ -168,9 +189,10 @@ if __name__ == "__main__":
     learning_rate = 0.1
     reward_gamma = 0.95
     greedy = 0.4
-    lambda_val = 0.6
+    from_lambda_val = 0
+    to_lambda_val = 0.5
     max_reward_coefficient = 0.75
-    QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, lambda_val, max_reward_coefficient)
+    QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, from_lambda_val, to_lambda_val, max_reward_coefficient)
     QLearner.set_greedy_rule([0.9], episodes*0.9, 0.95)
 
     # run the training
