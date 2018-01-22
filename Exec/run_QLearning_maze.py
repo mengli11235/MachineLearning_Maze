@@ -1,5 +1,5 @@
 from LearningAlgos.QLearning_RL import QLearningTable
-from maze_layouts import MazeSmall, MazeLarge
+from MazeEnv.maze_layouts import MazeSmall, MazeLarge
 import pandas as pd
 import matplotlib
 matplotlib.use("TkAgg")
@@ -80,6 +80,15 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     m, s = divmod(training_time, 60)
     h, m = divmod(m, 60)
     print("Total training time: %d hr %02d min %02d sec" % (h, m, s))
+
+    plt.figure(1)
+    plt.plot(epo, rewards)
+    plt.figure(2)
+    plt.plot(epo, step_array)
+    # plt.figure(3)
+    # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
+    plt.show()
+
     if _is_render:
         time.sleep(1)
         env.destroy()
@@ -91,14 +100,6 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     for key in qtable_keys:
         QL.q_table_category[key].to_csv("tmp_data/temp_q_table_" + key + ".csv", sep=',', encoding='utf-8')
         # print(QL.q_table_category[key])
-    plt.figure(1)
-    plt.plot(epo, rewards)
-    plt.figure(2)
-    plt.plot(epo, step_array)
-    # plt.figure(3)
-    # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
-
-    plt.show()
 
 
 def running(epi, time_in_ms, _is_render, QL, env):
@@ -150,9 +151,9 @@ def running(epi, time_in_ms, _is_render, QL, env):
 if __name__ == "__main__":
     # set if render the GUI
     is_render = False
-    is_demo = True
+    is_demo = False
     # set number of runs
-    episodes = 300
+    episodes = 600
     # animation interval
     interval = 0.005
 

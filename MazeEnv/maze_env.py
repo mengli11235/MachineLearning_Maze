@@ -146,13 +146,13 @@ class MazeSimulator(tk.Tk, object):
                 key_obj = self.origin_coord + np.array([self.pixel * key_position[0], self.pixel * key_position[1]])
                 key_coordinates = self.canvas.create_text(
                     key_obj[0], key_obj[1],
-                    fill='black', text="key")
+                    fill='black', text=key+"-key")
 
                 chest_obj = self.origin_coord + np.array(
                     [self.pixel * reward_position[0], self.pixel * reward_position[1]])
                 chest_coordinates = self.canvas.create_text(
                     chest_obj[0], chest_obj[1],
-                    fill='black', text="chest")
+                    fill='black', text=key+"-chest")
 
             self.key_list.append([key_position, key, key_reward, chest_reward, key_coordinates])
             self.chest_list.append([reward_position, key, 0, chest_coordinates])
@@ -202,7 +202,7 @@ class MazeSimulator(tk.Tk, object):
         if len(collide_walls) > 0:
             new_state = np.array([self.agent[0], self.agent[1]])
             new_condition = self.print_list(self.agent_keys) + "_" + self.print_list(self.agent_chests)
-            return new_state, new_condition, self.step_penalty*3, False
+            return new_state, new_condition, collide_walls[0][1], False
 
         if has_hit_border:
             new_state = np.array([self.agent[0], self.agent[1]])
