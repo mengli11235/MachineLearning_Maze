@@ -30,6 +30,8 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     time_array = []
     epo = []
     step_array = []
+    step_array_accu = []
+    accu_steps = 0
     training_time = time.time()
     per_5 = math.floor(epi/20)
 
@@ -70,6 +72,8 @@ def learning(epi, time_in_ms, _is_render, QL, env):
                 rewards.append(reward_in_each_epi)
                 time_array.append(format(time.time() - init_time, '.2f'))
                 step_array.append(step)
+                accu_steps = accu_steps + step
+                step_array_accu.append(accu_steps)
                 # step_array = step_counter(step_array)
                 # print(time_array)
                 epo.append(episode+1)
@@ -99,6 +103,8 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     plt.plot(epo, rewards)
     plt.figure(2)
     plt.plot(epo, step_array)
+    plt.figure(3)
+    plt.plot(step_array_accu, rewards)
     # plt.figure(3)
     # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
     plt.show()
@@ -158,12 +164,18 @@ if __name__ == "__main__":
     # set if render the GUI
     is_render = False
     is_demo = False
+<<<<<<< HEAD
 
+=======
+>>>>>>> 43927978b3b2ab2f711cbb6a16fe39ef81c27242
     # set number of runs
-    episodes = 1500
+    episodes = 300
     # animation interval
     interval = 0.005
+<<<<<<< HEAD
 
+=======
+>>>>>>> 43927978b3b2ab2f711cbb6a16fe39ef81c27242
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
@@ -184,7 +196,7 @@ if __name__ == "__main__":
 
     max_reward_coefficient = 0.75
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, max_reward_coefficient)
-    QLearner.set_greedy_rule([0.9], episodes*0.9, 0.95)
+    QLearner.set_greedy_rule([0.9], episodes*0.95, 0.9)
 
     # run the training
     if not is_demo:

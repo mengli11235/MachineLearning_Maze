@@ -25,7 +25,7 @@ def step_counter(_current_array=-1, _length=30):
         return _current_array
 
 
-def learning(epi, time_in_ms, _is_render, QL, env):
+def learning(epi, time_in_ms, _is_render, QL, env, max_steps):
     rewards = []
     time_array = []
     epo = []
@@ -47,7 +47,7 @@ def learning(epi, time_in_ms, _is_render, QL, env):
         # initial all zero eligibility trace
         QL.reset_trace()
 
-        while True:
+        for step in range(max_steps):
             # fresh env
             env.render(time_in_ms)
 
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of uns
-    episodes = 1200
+    episodes = 300
     # animation interval
     interval = 0.005
 
@@ -171,24 +171,27 @@ if __name__ == "__main__":
     # all position count from 0
     init_pos = [0, 0]
 
+    # maximal number of states
+    max_steps = 1500
+
     # initiate maze simulator for learning and running
     if is_demo:
         is_render = True
 
     # maze = MazeSmall(init_pos).init_maze(is_render)
-    # maze = MazeMedium(init_pos).init_maze(is_render)
-    maze = MazeLarge(init_pos).init_maze(is_render)
+    maze = MazeMedium(init_pos).init_maze(is_render)
+    # maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate QLearner
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.95
     greedy = 0.4
-    from_lambda_val = 0
-    to_lambda_val = 0.4
+    from_lambda_val = 0.5
+    to_lambda_val = 0.5
     max_reward_coefficient = 0.75
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, from_lambda_val, to_lambda_val, max_reward_coefficient)
-    QLearner.set_greedy_rule([0.9], episodes*0.9, 0.95)
+    QLearner.set_greedy_rule([0.9], episodes*0.95, 0.9)
 
     # run the training
     if not is_demo:
@@ -196,7 +199,7 @@ if __name__ == "__main__":
             maze.after(1, learning(episodes, interval, is_render, QLearner, maze))
             maze.mainloop()
         else:
-            learning(episodes, interval, is_render, QLearner, maze)
+            learning(episodes, interval, is_render, QLearner, maze, max_steps)
     # run the simulation of result
     else:
         # Q decision with 99% greedy strategy

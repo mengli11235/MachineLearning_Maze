@@ -1,8 +1,8 @@
 import numpy as np
-from MazeEnv.maze_env import MazeSimulator
+from MazeEnv.maze_env_qv import MazeSimulator
 
 
-class MazeLarge:
+class MazeLargeQV:
     def __init__(self, init_pos=[0, 0], size_maze=[20, 20]):
         # set the size of maze:     column x row
         self.size_maze = size_maze
@@ -57,7 +57,7 @@ class MazeLarge:
         return maze
 
 
-class MazeMedium:
+class MazeMediumQV:
     def __init__(self, init_pos=[0, 0], size_maze=[12, 12]):
         # set the size of maze:     column x row
         self.size_maze = size_maze
@@ -106,7 +106,7 @@ class MazeMedium:
         return maze
 
 
-class MazeSmall:
+class MazeSmallQV:
     def __init__(self, init_pos=[0, 0], size_maze=[9, 6]):
         # set the size of maze:     column x row
         self.size_maze = size_maze
