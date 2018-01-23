@@ -159,7 +159,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 1500
+    episodes = 500
     # animation interval
     interval = 0.005
 
@@ -183,7 +183,7 @@ if __name__ == "__main__":
 
     max_reward_coefficient = 0.75
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, max_reward_coefficient)
-    QLearner.set_greedy_rule([0.9], episodes*0.9, 0.95)
+    QLearner.set_greedy_rule([0.9], episodes*0.95, 0.9)
 
     # run the training
     if not is_demo:

@@ -164,7 +164,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 1200
+    episodes = 300
     # animation interval
     interval = 0.005
 
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     lambda_val = 0.5
     max_reward_coefficient = 0.75
     SLearner = SarsaLambda(actions, learning_rate, reward_gamma, greedy, lambda_val, max_reward_coefficient)
-    SLearner.set_greedy_rule([0.9], episodes*0.9, 0.95)
+    SLearner.set_greedy_rule([0.9], episodes*0.95, 0.9)
 
     # run the training
     if not is_demo:
