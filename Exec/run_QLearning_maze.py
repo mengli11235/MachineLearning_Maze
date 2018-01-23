@@ -164,18 +164,12 @@ if __name__ == "__main__":
     # set if render the GUI
     is_render = False
     is_demo = False
-<<<<<<< HEAD
 
-=======
->>>>>>> 43927978b3b2ab2f711cbb6a16fe39ef81c27242
     # set number of runs
     episodes = 300
     # animation interval
     interval = 0.005
-<<<<<<< HEAD
-
-=======
->>>>>>> 43927978b3b2ab2f711cbb6a16fe39ef81c27242
+    
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
