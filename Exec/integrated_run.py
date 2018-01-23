@@ -579,13 +579,13 @@ class QVLambda:
 
 
 if __name__ == "__main__":
-    lambda_arr = [0]
-    # lambda_arr = [0, 0.5, 0.8]
+    # lambda_arr = [0]
+    lambda_arr = [0, 0.5, 0.8]
     f1 = QLambda().run
     f2 = _SarsaLambda().run
     f3 = QVLambda().run
 
-    simulation = 1
+    simulation = 30
     maze_index = 1
     total_epi = 25000
     steps_epoch = 200
