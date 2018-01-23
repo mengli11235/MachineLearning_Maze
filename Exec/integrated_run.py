@@ -85,14 +85,15 @@ class QLambda:
                         print()
                         # print(epo)
                     break
-
+                # print(epi)
                 if epi <= 0:
                     break
 
             episode = episode + 1
 
             if epi <= 0:
-                print(episode)
+                print("finish")
+                # print(episode)
                 break
         return step_reward
 
@@ -160,6 +161,8 @@ class QLambda:
                 # break while loop when end of this episode
                 if is_done:
                     break
+
+                print(epi)
                 if epi <= 0:
                     break
 
@@ -233,7 +236,7 @@ class QLambda:
             self.running(30, demo_interval, True, QRunner, maze)
 
 
-class SarsaLambda:
+class _SarsaLambda:
     def __init__(self):
         pass
 
@@ -289,6 +292,7 @@ class SarsaLambda:
 
                 # count step
                 step = step + 1
+                epi = epi - 1
 
                 # calculate average reward per n steps
                 if len(rewards_memory) == 5000 or is_done:
@@ -302,6 +306,8 @@ class SarsaLambda:
                     step_array.append(step)
                     epo.append(1)
                     break
+
+                # print(epi)
                 if epi <= 0:
                     break
 
@@ -442,10 +448,10 @@ class SarsaLambda:
         # run the training
         if not is_demo:
             if is_render:
-                maze.after(1, self.learning(episodes, interval, is_render, SLearner, maze, max_steps))
+                maze.after(1, self.learning(epi, interval, is_render, SLearner, maze, max_steps))
                 maze.mainloop()
             else:
-                return self.learning(episodes, interval, is_render, SLearner, maze, max_steps)
+                return self.learning(epi, interval, is_render, SLearner, maze, max_steps)
         # run the simulation of result
         else:
             # Q decision with 99% greedy strategy
@@ -492,6 +498,8 @@ class QVLambda:
                 # swap observation
                 agent = new_state
 
+                epi = epi - 1
+
                 # calculate average reward per n steps
                 if len(rewards_memory) == 5000 or is_done:
                     step_reward.append(statistics.mean(rewards_memory))
@@ -507,13 +515,11 @@ class QVLambda:
                     epo.append(1)
                     # print(epo)
                     break
+                # print(epi)
                 if epi <= 0:
                     break
 
-            episode = episode + 1
-
             if epi <= 0:
-                print(episode)
                 break
         return step_reward
         # end of game
@@ -548,11 +554,11 @@ class QVLambda:
             is_render = True
 
         if maze_index == 0:
-            maze = MazeSmall(init_pos).init_maze(is_render)
+            maze = MazeSmallQV(init_pos).init_maze(is_render)
         elif maze_index == 1:
-            maze = MazeMedium(init_pos).init_maze(is_render)
+            maze = MazeMediumQV(init_pos).init_maze(is_render)
         elif maze_index == 2:
-            maze = MazeLarge(init_pos).init_maze(is_render)
+            maze = MazeLargeQV(init_pos).init_maze(is_render)
 
         # initiate QLearner
         actions = list(range(maze.n_actions))
@@ -566,23 +572,25 @@ class QVLambda:
 
         # run the simulation of training
         if is_render:
-            maze.after(1, self.learning(episodes, max_steps, interval, is_render, QLearner, Vlearner, maze))
+            maze.after(1, self.learning(epi, max_steps, interval, is_render, QLearner, Vlearner, maze))
             maze.mainloop()
         else:
-            return self.learning(episodes, max_steps, interval, is_render, QLearner, Vlearner, maze)
+            return self.learning(epi, max_steps, interval, is_render, QLearner, Vlearner, maze)
 
 
 if __name__ == "__main__":
     # lambda_arr = [0]
     lambda_arr = [0, 0.5, 0.8]
     f1 = QLambda().run
-    f2 = SarsaLambda().run
+    f2 = _SarsaLambda().run
     f3 = QVLambda().run
 
-    simulation = 1
+    simulation = 30
 
     for index in range(len(lambda_arr)):
         lmb = lambda_arr[index]
+
+        print("start Q lambda")
         min_steps = 999999
         f1_avg_rw_arr = []
         f1_avg_rw = []
@@ -602,6 +610,7 @@ if __name__ == "__main__":
             wr = csv.writer(f, quoting=csv.QUOTE_ALL)
             wr.writerow(f1_avg_rw)
 
+        print("start SARSA lambda")
         min_steps = 999999
         f2_avg_rw_arr = []
         f2_avg_rw = []
@@ -622,6 +631,7 @@ if __name__ == "__main__":
             wr = csv.writer(f, quoting=csv.QUOTE_ALL)
             wr.writerow(f2_avg_rw)
 
+        print("start QV lambda")
         min_steps = 999999
         f3_avg_rw_arr = []
         f3_avg_rw = []
@@ -642,8 +652,7 @@ if __name__ == "__main__":
             wr = csv.writer(f, quoting=csv.QUOTE_ALL)
             wr.writerow(f3_avg_rw)
 
-
-
+        print("finish")
         # plt.plot(range(len(f1_avg_rw)), f1_avg_rw)
         # plt.show()
         #
