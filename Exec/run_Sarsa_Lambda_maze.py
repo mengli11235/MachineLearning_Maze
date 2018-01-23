@@ -10,7 +10,7 @@ import csv
 import math
 
 
-def learning(epi, time_in_ms, _is_render, SL, env):
+def learning(epi, time_in_ms, _is_render, SL, env, max_steps):
     rewards = []
     time_array = []
     epo = []
@@ -38,7 +38,7 @@ def learning(epi, time_in_ms, _is_render, SL, env):
         # initial all zero eligibility trace
         SL.reset_trace()
 
-        while True:
+        for step in range(max_steps):
             # fresh env
             env.render(time_in_ms)
 
@@ -171,14 +171,17 @@ if __name__ == "__main__":
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
-    
+
+    # maximal number of states
+    max_steps = 1500
+
     # initiate maze simulator for learning and running
     if is_demo:
         is_render = True
 
     # maze = MazeSmall(init_pos).init_maze(is_render)
-    # maze = MazeMedium(init_pos).init_maze(is_render)
-    maze = MazeLarge(init_pos).init_maze(is_render)
+    maze = MazeMedium(init_pos).init_maze(is_render)
+    # maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate SarsaLearner
     actions = list(range(maze.n_actions))
@@ -195,10 +198,10 @@ if __name__ == "__main__":
     # run the training
     if not is_demo:
         if is_render:
-            maze.after(1, learning(episodes, interval, is_render, SLearner, maze))
+            maze.after(1, learning(episodes, interval, is_render, SLearner, maze, max_steps))
             maze.mainloop()
         else:
-            learning(episodes, interval, is_render, SLearner, maze)
+            learning(episodes, interval, is_render, SLearner, maze, max_steps)
     # run the simulation of result
     else:
         # Q decision with 99% greedy strategy

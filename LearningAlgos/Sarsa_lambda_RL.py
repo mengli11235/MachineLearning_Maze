@@ -22,11 +22,11 @@ class SarsaLambda:
         self.q_table_category[key] = df_qtable
 
     def set_greedy_rule(self, greedy_rate, episode, max_greedy):
-        base = 1 - self.global_e_greedy
-        target = 1 - max_greedy
+        base = self.global_e_greedy
+        target = max_greedy
         self.epoch_to_update = []
         for ind_greedy in greedy_rate:
-            rounds = math.ceil(math.log(target / base, ind_greedy))
+            rounds = math.ceil(math.log(target / base, 2 - ind_greedy))
             epos = math.floor(episode/rounds)
             epos = epos if epos > 0 else 1
             self.epoch_to_update.append(epos)
@@ -45,12 +45,12 @@ class SarsaLambda:
             epoch_update = obj[2]
             if epi != 0 and epi % epoch_update == 0 and epsilon != self.max_greedy:
                 greedy_rate = obj[3]
-                epsilon = 1 - (1 - epsilon) * greedy_rate
+                epsilon = epsilon * (2 - greedy_rate)
                 epsilon = self.max_greedy if epsilon > self.max_greedy else epsilon
-                print(key)
-                print(epi)
-                print(epsilon)
-                print()
+                # print(key)
+                # print(epi)
+                # print(epsilon)
+                # print()
                 # print(epsilon)
             self.greedy_dict[key][0] = epi
             self.greedy_dict[key][1] = epsilon

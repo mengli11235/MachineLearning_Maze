@@ -30,6 +30,8 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     time_array = []
     epo = []
     step_array = []
+    step_array_accu = []
+    accu_steps = 0
     training_time = time.time()
     per_5 = math.floor(epi/20)
 
@@ -70,6 +72,8 @@ def learning(epi, time_in_ms, _is_render, QL, env):
                 rewards.append(reward_in_each_epi)
                 time_array.append(format(time.time() - init_time, '.2f'))
                 step_array.append(step)
+                accu_steps = accu_steps + step
+                step_array_accu.append(accu_steps)
                 # step_array = step_counter(step_array)
                 # print(time_array)
                 epo.append(episode+1)
@@ -99,6 +103,8 @@ def learning(epi, time_in_ms, _is_render, QL, env):
     plt.plot(epo, rewards)
     plt.figure(2)
     plt.plot(epo, step_array)
+    plt.figure(3)
+    plt.plot(step_array_accu, rewards)
     # plt.figure(3)
     # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
     plt.show()
@@ -159,7 +165,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 500
+    episodes = 300
     # animation interval
     interval = 0.005
     # initial position of the agent
@@ -171,8 +177,8 @@ if __name__ == "__main__":
         is_render = True
 
     # maze = MazeSmall(init_pos).init_maze(is_render)
-    # maze = MazeMedium(init_pos).init_maze(is_render)
-    maze = MazeLarge(init_pos).init_maze(is_render)
+    maze = MazeMedium(init_pos).init_maze(is_render)
+    # maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate QLearner
     actions = list(range(maze.n_actions))
