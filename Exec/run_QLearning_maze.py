@@ -162,7 +162,6 @@ if __name__ == "__main__":
     episodes = 500
     # animation interval
     interval = 0.005
-
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
