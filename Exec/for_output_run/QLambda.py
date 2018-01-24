@@ -110,13 +110,13 @@ class QLambda:
 
 
         # plt.plot(range(len(step_reward)), step_reward)
-        plt.figure(1)
-        plt.plot(epo, rewards)
+        # plt.figure(1)
+        # plt.plot(epo, rewards)
         # plt.figure(2)
         # plt.plot(epo, step_array)
         # plt.figure(3)
         # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
-        plt.show()
+        # plt.show()
 
         return step_reward
 

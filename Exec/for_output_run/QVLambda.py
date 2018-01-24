@@ -82,8 +82,8 @@ class QVLambda:
 
         # QL.q_table.to_csv("temp_q_table.csv", sep=',', encoding='utf-8')
         # print(QL.q_table)
-        plt.plot(epo, rewards)
-        plt.show()
+        # plt.plot(epo, rewards)
+        # plt.show()
         return step_reward
 
     def run(self, lambda_, maze_index, epi, episodes, max_steps, reward_gamma, greedy_rule, max_reward_coefficient):
