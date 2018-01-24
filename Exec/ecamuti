@@ -223,7 +223,7 @@ class QLambda:
         # run the training
         if not is_demo:
             if is_render:
-                maze.after(1, self.learning(epi, interval, is_render, QLearner, maze))
+                maze.after(1, self.learning(epi, interval, is_render, QLearner, maze, max_steps))
                 maze.mainloop()
             else:
                 return self.learning(epi, interval, is_render, QLearner, maze, max_steps)
