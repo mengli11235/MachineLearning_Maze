@@ -74,18 +74,18 @@ class MazeMedium:
             [[3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [5, 0],
              [9, 0], [9, 1], [9, 2], [9, 3],
              [2, 4], [2, 5], [2, 6], [2, 7], [2, 8], [0, 6], [1, 6],
-             [5, 4], [5, 5], [5, 6], [6, 5], [7, 5],
-             [7, 8], [5, 9], [6, 9], [7, 9], [8, 9], [9, 9], [5, 10]],
+             [5, 4], [5, 5], [6, 5], [7, 5],
+             [5, 9], [6, 9], [7, 9], [8, 9], [9, 9], [5, 10]],
             np.float64)
 
         # set pits (extra cost when stepping on it)
         pits = np.array(
-            [[8, 4]],
+            [[6, 6], [6, 8]],
             np.float64)
 
         # set exit, with certain rewards
         exits = np.array(
-            [[10, 6]],
+            [[8, 7]],
             np.float64)
 
         maze.set_agent()
@@ -93,7 +93,7 @@ class MazeMedium:
         for row in walls:
             maze.set_wall(row, -3, False)
         for row in pits:
-            maze.set_fixed_obj(row, -200, False)
+            maze.set_fixed_obj(row, -100, False)
         for row in exits:
             # You might need to change set_fixed_obj() function if you change the reward for exit
             maze.set_fixed_obj(row, 500, True)
