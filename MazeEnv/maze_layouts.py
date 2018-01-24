@@ -148,7 +148,7 @@ class MazeSmall:
             maze.set_fixed_obj(row, 50, True)
 
         # set chest and its key
-        maze.set_key_chest([0, 5], [8, 5], 'k', 0, 50)
+        maze.set_key_chest([0, 5], [8, 5], '1', 0, 50)
 
         # build the rendered maze
         maze.build_maze()
