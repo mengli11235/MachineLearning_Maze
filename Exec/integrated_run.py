@@ -634,26 +634,26 @@ if __name__ == "__main__":
             wr = csv.writer(f, quoting=csv.QUOTE_ALL)
             wr.writerow(f2_avg_rw)
 
-        print("start QV lambda")
-        min_steps = 999999
-        f3_avg_rw_arr = []
-        f3_avg_rw = []
-        for ix in range(simulation):
-            p = f3(lmb, maze_index, total_epi, steps_epoch)
-            f3_avg_rw_arr.append(p)
-            if min_steps > len(p):
-                min_steps = len(p)
-        for idx in range(min_steps):
-            sum_val = 0
-            length = len(f3_avg_rw_arr)
-            for ix in range(length):
-                sum_val += f3_avg_rw_arr[ix][idx]
-            f3_avg_rw.append(sum_val / length)
-
-        with open('tmp_data/qv_lambda_avg_reward' + str(index) + '.csv',
-                  'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
-            wr = csv.writer(f, quoting=csv.QUOTE_ALL)
-            wr.writerow(f3_avg_rw)
+        # print("start QV lambda")
+        # min_steps = 999999
+        # f3_avg_rw_arr = []
+        # f3_avg_rw = []
+        # for ix in range(simulation):
+        #     p = f3(lmb, maze_index, total_epi, steps_epoch)
+        #     f3_avg_rw_arr.append(p)
+        #     if min_steps > len(p):
+        #         min_steps = len(p)
+        # for idx in range(min_steps):
+        #     sum_val = 0
+        #     length = len(f3_avg_rw_arr)
+        #     for ix in range(length):
+        #         sum_val += f3_avg_rw_arr[ix][idx]
+        #     f3_avg_rw.append(sum_val / length)
+        #
+        # with open('tmp_data/qv_lambda_avg_reward' + str(index) + '.csv',
+        #           'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
+        #     wr = csv.writer(f, quoting=csv.QUOTE_ALL)
+        #     wr.writerow(f3_avg_rw)
 
         print("finish lambda", str(lmb))
         # plt.plot(range(len(f1_avg_rw)), f1_avg_rw)
