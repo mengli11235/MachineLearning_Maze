@@ -580,78 +580,83 @@ if __name__ == "__main__":
     # lambda_arr = [0]
     lambda_arr = [0, 0.5, 0.8]
     # f1 = QLambda().run
-    # f2 = _SarsaLambda().run
-    f3 = QVLambda().run
+    f2 = _SarsaLambda().run
+    # f3 = QVLambda().run
 
     simulation = 30
+    maze_index = 2
+    total_epi = 25000
+    steps_epoch = 200
 
     for index in range(len(lambda_arr)):
         lmb = lambda_arr[index]
 
-        # # print("start Q lambda")
-        # # min_steps = 999999
-        # # f1_avg_rw_arr = []
-        # # f1_avg_rw = []
-        # # for ix in range(simulation):
-        # #     p = f1(lmb, 0, 10000, 80)
-        # #     f1_avg_rw_arr.append(p)
-        # #     if min_steps > len(p):
-        # #         min_steps = len(p)
-        # # for idx in range(min_steps):
-        # #     sum_val = 0
-        # #     length = len(f1_avg_rw_arr)
-        # #     for ix in range(length):
-        # #         sum_val += f1_avg_rw_arr[ix][idx]
-        # #     f1_avg_rw.append(sum_val/length)
-        # #
-        # # with open('tmp_data/q_lambda_avg_reward' + str(index) + '.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
-        # #     wr = csv.writer(f, quoting=csv.QUOTE_ALL)
-        #     wr.writerow(f1_avg_rw)
-        #
-        # print("start SARSA lambda")
+        # print("start Q lambda")
         # min_steps = 999999
-        # f2_avg_rw_arr = []
-        # f2_avg_rw = []
+        # f1_avg_rw_arr = []
+        # f1_avg_rw = []
         # for ix in range(simulation):
-        #     p = f2(lmb, 0, 10000, 80)
-        #     f2_avg_rw_arr.append(p)
+        #     p = f1(lmb, maze_index, total_epi, steps_epoch)
+        #     f1_avg_rw_arr.append(p)
         #     if min_steps > len(p):
         #         min_steps = len(p)
         # for idx in range(min_steps):
         #     sum_val = 0
-        #     length = len(f2_avg_rw_arr)
+        #     length = len(f1_avg_rw_arr)
         #     for ix in range(length):
-        #         sum_val += f2_avg_rw_arr[ix][idx]
-        #     f2_avg_rw.append(sum_val / length)
+        #         sum_val += f1_avg_rw_arr[ix][idx]
+        #     f1_avg_rw.append(sum_val/length)
         #
-        # with open('tmp_data/sarsa_lambda_avg_reward' + str(index) + '.csv',
-        #           'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
+        # with open('tmp_data/q_lambda_avg_reward' + str(index) + '.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
         #     wr = csv.writer(f, quoting=csv.QUOTE_ALL)
-        #     wr.writerow(f2_avg_rw)
-
-        print("start QV lambda")
+        #     wr.writerow(f1_avg_rw)
+        #
+        print("start SARSA lambda")
         min_steps = 999999
-        f3_avg_rw_arr = []
-        f3_avg_rw = []
+        f2_avg_rw_arr = []
+        f2_avg_rw = []
         for ix in range(simulation):
-            p = f3(lmb, 0, 10000, 80)
-            f3_avg_rw_arr.append(p)
+            p = f2(lmb, maze_index, total_epi, steps_epoch)
+            f2_avg_rw_arr.append(p)
             if min_steps > len(p):
                 min_steps = len(p)
         for idx in range(min_steps):
             sum_val = 0
-            length = len(f3_avg_rw_arr)
+            length = len(f2_avg_rw_arr)
             for ix in range(length):
-                sum_val += f3_avg_rw_arr[ix][idx]
-            f3_avg_rw.append(sum_val / length)
+                sum_val += f2_avg_rw_arr[ix][idx]
+            f2_avg_rw.append(sum_val / length)
 
-        with open('tmp_data/qv_lambda_avg_reward' + str(index) + '.csv',
+        with open('tmp_data/sarsa_lambda_avg_reward' + str(index) + '.csv',
                   'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
             wr = csv.writer(f, quoting=csv.QUOTE_ALL)
-            wr.writerow(f3_avg_rw)
+            wr.writerow(f2_avg_rw)
 
-        print("finish")
+        # print("start QV lambda")
+        # min_steps = 999999
+        # f3_avg_rw_arr = []
+        # f3_avg_rw = []
+        # for ix in range(simulation):
+        #     p = f3(lmb, maze_index, total_epi, steps_epoch)
+        #     f3_avg_rw_arr.append(p)
+        #     if min_steps > len(p):
+        #         min_steps = len(p)
+        # for idx in range(min_steps):
+        #     sum_val = 0
+        #     length = len(f3_avg_rw_arr)
+        #     for ix in range(length):
+        #         sum_val += f3_avg_rw_arr[ix][idx]
+        #     f3_avg_rw.append(sum_val / length)
+        #
+        # with open('tmp_data/qv_lambda_avg_reward' + str(index) + '.csv',
+        #           'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
+        #     wr = csv.writer(f, quoting=csv.QUOTE_ALL)
+        #     wr.writerow(f3_avg_rw)
+
+        print("finish lambda", str(lmb))
         # plt.plot(range(len(f1_avg_rw)), f1_avg_rw)
+        # plt.plot(range(len(f2_avg_rw)), f2_avg_rw)
+        # plt.plot(range(len(f3_avg_rw)), f3_avg_rw)
         # plt.show()
         #
         # for ix in range(simulation):
