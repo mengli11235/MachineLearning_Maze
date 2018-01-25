@@ -17,13 +17,13 @@ def learning(epi, time_in_ms, _is_render, SL, env, max_steps):
     step_array = []
     training_time = time.time()
     per_5 = math.floor(epi/20)
+    totalStep = 0
 
     for episode in range(epi):
         # initial observation
         # observation = env.reset()
         reward_in_epoch = 0
         init_time = time.time()
-        step = 0
 
         if episode%per_5 == 0:
             print("{} %".format((episode/per_5)*5))
@@ -58,18 +58,19 @@ def learning(epi, time_in_ms, _is_render, SL, env, max_steps):
             action = action_
 
             # count step
-            step = step + 1
+            totalStep = totalStep + 1
 
             # break while loop when end of this episode
             if is_done:
-                rewards.append(reward_in_epoch)
-                time_array.append(format(time.time()-init_time, '.2f'))
-                step_array.append(step)
-                epo.append(episode + 1)
                 break
 
+        rewards.append(reward_in_epoch)
+        time_array.append(format(time.time() - init_time, '.2f'))
+        step_array.append(step)
+        epo.append(episode + 1)
+
     # end of game
-    print('game over')
+    print('game over', totalStep)
     # print training time
     training_time = time.time() - training_time
     m, s = divmod(training_time, 60)
@@ -186,13 +187,14 @@ if __name__ == "__main__":
     # initiate SarsaLearner
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
-    reward_gamma = 0.9
-    greedy = 0.4
+    reward_gamma = 0.95
+    greedy = 0.6
     # lambda_val = 0
+    # lambda_val = 0.5
     lambda_val = 0.5
     max_reward_coefficient = 0.8
     SLearner = SarsaLambda(actions, learning_rate, reward_gamma, greedy, lambda_val, max_reward_coefficient)
-    SLearner.set_greedy_rule([0.9], episodes*0.95, 0.9)
+    SLearner.set_greedy_rule([0.9], episodes*0.95, 0.7)
 
     # run the training
     if not is_demo:

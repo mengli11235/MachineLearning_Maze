@@ -134,6 +134,7 @@ class QLearningTable:
             next_expectation = 0 if extra_state not in self.max_reward else self.max_reward[extra_state]
             q_target = r + next_expectation
             reward_coefficient = self.check_max_reward(extra_s, q_target)
+            # print(reward_coefficient)
             # print(self.max_reward)
             # print(q_target)
         elif not is_done:
@@ -141,6 +142,8 @@ class QLearningTable:
         else:
             q_target = r  # next state is terminal
             reward_coefficient = self.check_max_reward(extra_s, q_target)
+            # print(reward_coefficient)
+            # print(self.max_reward)
             # print(q_target)
         error = q_target - q_predict
 

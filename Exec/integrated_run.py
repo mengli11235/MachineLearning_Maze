@@ -48,16 +48,16 @@ if __name__ == "__main__":
     f3 = QVLambda().run
 
     # base parameter values
-    total_epi = 15000
-    episodes = 250
-    max_steps = 500
+    total_epi = 30000
+    episodes = 300
+    max_steps = 300
     reward_gamma = 0.95
-    greedy_rule = [0.4, [0.9], 0.9]
+    greedy_rule = [0.6, [0.9], 0.7]
     max_reward_coefficient = 0.8
 
     para_names = ["total_epi", "episodes", "max_steps", "reward_gamma", "greedy_rule", "max_reward_coefficient"]
     simulation = 30
-    maze_index = 0
+    maze_index = 1
 
     # "total_epi"
     # "episodes"
@@ -69,24 +69,24 @@ if __name__ == "__main__":
         algo_names[0]: [
             {
                 para_names[0]: total_epi,
-                para_names[1]: 300,
-                para_names[2]: 500,
+                para_names[1]: episodes,
+                para_names[2]: max_steps,
                 para_names[3]: 0.95,
                 para_names[4]: greedy_rule,
                 para_names[5]: max_reward_coefficient
             },
             {
                 para_names[0]: total_epi,
-                para_names[1]: 350,
-                para_names[2]: 500,
-                para_names[3]: 0.95,
+                para_names[1]: episodes,
+                para_names[2]: max_steps,
+                para_names[3]: 0.85,
                 para_names[4]: greedy_rule,
                 para_names[5]: max_reward_coefficient
             },
             {
                 para_names[0]: total_epi,
-                para_names[1]: 300,
-                para_names[2]: 500,
+                para_names[1]: episodes,
+                para_names[2]: max_steps,
                 para_names[3]: 0.8,
                 para_names[4]: greedy_rule,
                 para_names[5]: max_reward_coefficient
@@ -94,34 +94,34 @@ if __name__ == "__main__":
         ],
         algo_names[1]: [
             {
-                para_names[0]: total_epi,
-                para_names[1]: 200,
-                para_names[2]: 500,
+                para_names[0]: 40000,
+                para_names[1]: episodes,
+                para_names[2]: 400,
                 para_names[3]: 0.95,
-                para_names[4]: greedy_rule,
+                para_names[4]: [0.6, [0.9], 0.7],
                 para_names[5]: max_reward_coefficient
             },
             {
-                para_names[0]: total_epi,
-                para_names[1]: 320,
-                para_names[2]: 500,
-                para_names[3]: 0.95,
-                para_names[4]: greedy_rule,
+                para_names[0]: 40000,
+                para_names[1]: episodes,
+                para_names[2]: 400,
+                para_names[3]: 0.9,
+                para_names[4]: [0.6, [0.9], 0.7],
                 para_names[5]: max_reward_coefficient
             },
             {
-                para_names[0]: total_epi,
-                para_names[1]: 320,
-                para_names[2]: 500,
-                para_names[3]: 0.85,
-                para_names[4]: greedy_rule,
+                para_names[0]: 40000,
+                para_names[1]: episodes,
+                para_names[2]: 400,
+                para_names[3]: 0.9,
+                para_names[4]: [0.6, [0.9], 0.7],
                 para_names[5]: max_reward_coefficient
             }
         ],
         algo_names[2]: [
             {
                 para_names[0]: total_epi,
-                para_names[1]: 180,
+                para_names[1]: episodes,
                 para_names[2]: 500,
                 para_names[3]: 0.95,
                 para_names[4]: [0.6],
@@ -129,7 +129,7 @@ if __name__ == "__main__":
             },
             {
                 para_names[0]: total_epi,
-                para_names[1]: 350,
+                para_names[1]: episodes,
                 para_names[2]: 500,
                 para_names[3]: 0.95,
                 para_names[4]: [0.7],
@@ -146,24 +146,108 @@ if __name__ == "__main__":
         ]
     }
 
+    #====== for small maze======#
+    # parameter_dict = {
+    #     algo_names[0]: [
+    #         {
+    #             para_names[0]: total_epi,
+    #             para_names[1]: 300,
+    #             para_names[2]: 500,
+    #             para_names[3]: 0.95,
+    #             para_names[4]: greedy_rule,
+    #             para_names[5]: max_reward_coefficient
+    #         },
+    #         {
+    #             para_names[0]: total_epi,
+    #             para_names[1]: 350,
+    #             para_names[2]: 500,
+    #             para_names[3]: 0.95,
+    #             para_names[4]: greedy_rule,
+    #             para_names[5]: max_reward_coefficient
+    #         },
+    #         {
+    #             para_names[0]: total_epi,
+    #             para_names[1]: 300,
+    #             para_names[2]: 500,
+    #             para_names[3]: 0.8,
+    #             para_names[4]: greedy_rule,
+    #             para_names[5]: max_reward_coefficient
+    #         }
+    #     ],
+    #     algo_names[1]: [
+    #         {
+    #             para_names[0]: total_epi,
+    #             para_names[1]: 200,
+    #             para_names[2]: 500,
+    #             para_names[3]: 0.95,
+    #             para_names[4]: greedy_rule,
+    #             para_names[5]: max_reward_coefficient
+    #         },
+    #         {
+    #             para_names[0]: total_epi,
+    #             para_names[1]: 320,
+    #             para_names[2]: 500,
+    #             para_names[3]: 0.95,
+    #             para_names[4]: greedy_rule,
+    #             para_names[5]: max_reward_coefficient
+    #         },
+    #         {
+    #             para_names[0]: total_epi,
+    #             para_names[1]: 320,
+    #             para_names[2]: 500,
+    #             para_names[3]: 0.85,
+    #             para_names[4]: greedy_rule,
+    #             para_names[5]: max_reward_coefficient
+    #         }
+    #     ],
+    #     algo_names[2]: [
+    #         {
+    #             para_names[0]: total_epi,
+    #             para_names[1]: 180,
+    #             para_names[2]: 500,
+    #             para_names[3]: 0.95,
+    #             para_names[4]: [0.6],
+    #             para_names[5]: max_reward_coefficient
+    #         },
+    #         {
+    #             para_names[0]: total_epi,
+    #             para_names[1]: 350,
+    #             para_names[2]: 500,
+    #             para_names[3]: 0.95,
+    #             para_names[4]: [0.7],
+    #             para_names[5]: max_reward_coefficient
+    #         },
+    #         {
+    #             para_names[0]: total_epi,
+    #             para_names[1]: 350,
+    #             para_names[2]: 500,
+    #             para_names[3]: 0.8,
+    #             para_names[4]: [0.7],
+    #             para_names[5]: max_reward_coefficient
+    #         }
+    #     ]
+    # }
+
     for index in range(len(lambda_arr)):
         lmb = lambda_arr[index]
-        # index = 2 # just for tuning REMOVE LATER!!!
+        index = 2  # just for tuning REMOVE LATER!!!
 
-        _parameters = parameter_dict[algo_names[0]][index]
-        single_run(f1, lmb, maze_index, _parameters[para_names[0]], _parameters[para_names[1]], algo_names[0],
-                   simulation, _parameters[para_names[2]], _parameters[para_names[3]], _parameters[para_names[4]],
-                   _parameters[para_names[5]])
+        # _parameters = parameter_dict[algo_names[0]][index]
+        # single_run(f1, lmb, maze_index, _parameters[para_names[0]], _parameters[para_names[1]], algo_names[0],
+        #            simulation, _parameters[para_names[2]], _parameters[para_names[3]], _parameters[para_names[4]],
+        #            _parameters[para_names[5]])
 
         _parameters = parameter_dict[algo_names[1]][index]
+        print(lmb)
+        print(_parameters)
         single_run(f2, lmb, maze_index, _parameters[para_names[0]], _parameters[para_names[1]], algo_names[1],
                    simulation, _parameters[para_names[2]], _parameters[para_names[3]], _parameters[para_names[4]],
                    _parameters[para_names[5]])
 
-        _parameters = parameter_dict[algo_names[2]][index]
-        single_run(f3, lmb, maze_index, _parameters[para_names[0]], _parameters[para_names[1]], algo_names[2],
-                   simulation, _parameters[para_names[2]], _parameters[para_names[3]], _parameters[para_names[4]],
-                   _parameters[para_names[5]])
+        # _parameters = parameter_dict[algo_names[2]][index]
+        # single_run(f3, lmb, maze_index, _parameters[para_names[0]], _parameters[para_names[1]], algo_names[2],
+        #            simulation, _parameters[para_names[2]], _parameters[para_names[3]], _parameters[para_names[4]],
+        #            _parameters[para_names[5]])
 
         print("finish lambda", str(lmb))
 
