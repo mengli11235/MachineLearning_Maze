@@ -1,4 +1,4 @@
-from MazeEnv.maze_layouts_qv import MazeSmallQV, MazeLargeQV, MazeMediumQV
+from MazeEnv.maze_layouts import MazeSmall, MazeLarge, MazeMedium
 from LearningAlgos.QV_lambda_RL import QTable, VTable
 import pandas as pd
 import matplotlib
@@ -9,6 +9,7 @@ import time
 import csv
 import math
 import statistics
+import numpy as np
 
 
 class QVLambda:
@@ -38,9 +39,11 @@ class QVLambda:
                 action = QL.choose_action(current_state)
 
                 # RL take action and get next observation and reward
-                new_state, reward, is_done = env.taking_action(action)
+                new_state, extra_state, reward, is_done = env.taking_action(action)
+                new_state = np.append(new_state, extra_state)
                 reward_in_each_epi += reward
                 rewards_memory.append(reward)
+                print(new_state)
 
                 # RL learn from this transition
                 QL.learn(VL, current_state, action, reward, str(new_state), is_done)
@@ -107,11 +110,11 @@ class QVLambda:
             is_render = True
 
         if maze_index == 0:
-            maze = MazeSmallQV(init_pos).init_maze(is_render)
+            maze = MazeSmall(init_pos).init_maze(is_render)
         elif maze_index == 1:
-            maze = MazeMediumQV(init_pos).init_maze(is_render)
+            maze = MazeMedium(init_pos).init_maze(is_render)
         elif maze_index == 2:
-            maze = MazeLargeQV(init_pos).init_maze(is_render)
+            maze = MazeLarge(init_pos).init_maze(is_render)
 
         # initiate QLearner
         actions = list(range(maze.n_actions))
