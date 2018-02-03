@@ -43,16 +43,16 @@ class QVLambda:
                 new_state = np.append(new_state, extra_state)
                 reward_in_each_epi += reward
                 rewards_memory.append(reward)
-                print(new_state)
+                # print(new_state)
 
                 # RL learn from this transition
                 QL.learn(VL, current_state, action, reward, str(new_state), is_done)
                 VL.update(current_state, reward, str(new_state), is_done)
+                print(epi)
+                print(QL.epsilon)
 
                 # swap observation
                 agent = new_state
-
-                epi = epi - 1
 
                 # calculate average reward per n steps
                 if len(rewards_memory) == 500:
@@ -73,6 +73,8 @@ class QVLambda:
                 if epi <= 0:
                     break
 
+            epi = epi - 1
+            QL.update_episode(epi)
             episode = episode + 1
             if epi <= 0:
                 break
@@ -91,7 +93,7 @@ class QVLambda:
 
     def run(self, lambda_, maze_index, epi, episodes, max_steps, reward_gamma, greedy_rule, max_reward_coefficient):
         # set if render the GUI
-        is_render = False
+        is_render = True
         is_demo = False
         # set number of runs
         episodes = episodes
@@ -103,7 +105,7 @@ class QVLambda:
         init_pos = [0, 0]
 
         # maximal number of states
-        max_steps = max_steps
+        max_steps = 999999999999
 
         # initiate maze simulator for learning and running
         if is_demo:
@@ -123,7 +125,7 @@ class QVLambda:
         reward_gamma = reward_gamma
         greedy = greedy_rule[0]
         lambda_v = lambda_
-        QLearner = QTable(actions, learning_rate_q, reward_gamma, greedy)
+        QLearner = QTable(actions, learning_rate_q, reward_gamma, greedy, epi)
         Vlearner = VTable(learning_rate_v, reward_gamma, lambda_v)
 
         # run the simulation of training

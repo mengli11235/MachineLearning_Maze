@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import math
 
 
 class VTable:
@@ -49,12 +50,13 @@ class VTable:
 
 class QTable:
 
-    def __init__(self, actions, learning_rate, reward_decay, e_greedy):
+    def __init__(self, actions, learning_rate, reward_decay, e_greedy, epi):
         self.actions = actions  # a list
         self.lr = learning_rate
         self.gamma = reward_decay
         self.epsilon = e_greedy
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
+        self.diff_epsilon = (0.99 - self.epsilon)/epi
 
     def set_prior_qtable(self, df_qtable):
         self.q_table = df_qtable
@@ -93,3 +95,7 @@ class QTable:
                     name=state,
                 )
             )
+
+    def update_episode(self, epi):
+        if epi != 0 and self.epsilon <= 0.99:
+            self.epsilon = self.epsilon + self.diff_epsilon
