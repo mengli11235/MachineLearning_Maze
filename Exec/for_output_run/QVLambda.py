@@ -48,8 +48,6 @@ class QVLambda:
                 # RL learn from this transition
                 QL.learn(VL, current_state, action, reward, str(new_state), is_done)
                 VL.update(current_state, reward, str(new_state), is_done)
-                print(epi)
-                print(QL.epsilon)
 
                 # swap observation
                 agent = new_state
@@ -59,9 +57,10 @@ class QVLambda:
                     step_reward.append(statistics.mean(rewards_memory))
                     rewards_memory = []
 
-                # break while loop when end of this episode
-                if is_done:
+                # break inner for loop when end of this episode
+                if is_done or i == max_steps-1:
                     # print(episode/epi)
+                    print('reward in this epoch: ' + str(reward_in_each_epi))
                     rewards.append(reward_in_each_epi)
                     # print(rewards)
                     time_array.append(format(time.time() - init_time, '.2f'))
@@ -74,6 +73,12 @@ class QVLambda:
                     break
 
             epi = epi - 1
+            print('remaining epochs: ' + str(epi))
+            # print(QL.q_table)
+            # if epi <= 2:
+            #     print(VL.v)
+            #     print(VL.traces)
+            # print(QL.epsilon)
             QL.update_episode(epi)
             episode = episode + 1
             if epi <= 0:
@@ -93,8 +98,9 @@ class QVLambda:
 
     def run(self, lambda_, maze_index, epi, episodes, max_steps, reward_gamma, greedy_rule, max_reward_coefficient):
         # set if render the GUI
-        is_render = True
+        is_render = False
         is_demo = False
+
         # set number of runs
         episodes = episodes
         # animation interval
@@ -103,9 +109,6 @@ class QVLambda:
         # initial position of the agent
         # all position count from 0
         init_pos = [0, 0]
-
-        # maximal number of states
-        max_steps = 999999999999
 
         # initiate maze simulator for learning and running
         if is_demo:

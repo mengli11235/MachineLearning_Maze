@@ -130,11 +130,11 @@ class MazeSimulator(tk.Tk, object):
 
         self.agent_chests = []
 
-        # if self.is_render:
-        #     for obj in self.key_list:
-        #         self.canvas.delete(obj[3])
-        #     for obj in self.chest_list:
-        #         self.canvas.delete(obj[3])
+        if self.is_render:
+            for obj in self.key_list:
+                self.canvas.delete(obj[4])
+            for obj in self.chest_list:
+                self.canvas.delete(obj[3])
 
         self.key_list = []
         self.chest_list = []
@@ -197,17 +197,10 @@ class MazeSimulator(tk.Tk, object):
                 new_position[0] = 1
                 has_hit_border = False
 
-        # Check if the agent collides with the wall, if so, it harshly dies
-        collide_walls = [obj for obj in self.walls if (obj[0][0] == new_state[0] and obj[0][1] == new_state[1] and obj[1] == 0)]
-        if len(collide_walls) > 0:
-            new_state = np.array([self.agent[0], self.agent[1]])
-            new_condition = self.print_list(self.agent_keys) + "_" + self.print_list(self.agent_chests)
-            return new_state, new_condition, collide_walls[0][1], False
-
         if has_hit_border:
             new_state = np.array([self.agent[0], self.agent[1]])
             new_condition = self.print_list(self.agent_keys) + "_" + self.print_list(self.agent_chests)
-            return new_state, new_condition, self.step_penalty*3, False
+            return new_state, new_condition, 3*self.step_penalty, False
 
         if self.is_render:
             self.canvas.move(self.agent_avatar, new_position[0] * self.pixel, new_position[1] * self.pixel)  # move agent

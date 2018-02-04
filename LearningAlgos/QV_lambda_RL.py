@@ -24,6 +24,7 @@ class VTable:
         else:
             target_v = r - self.v.ix[s, 0]
         self.v.ix[s, 0] = self.v.ix[s, 0] + self.lr * target_v * self.traces.ix[s, 0]
+        self.traces.ix[s, 0] = 0
         return self
 
     def check_state_exist(self, state):
@@ -65,7 +66,7 @@ class QTable:
         # print()
         self.check_state_exist(observation)
         # action selection
-        if np.random.uniform() < self.epsilon:
+        if np.random.uniform() <= self.epsilon:
             # choose best action
             state_action = self.q_table.ix[observation, :]
             state_action = state_action.reindex(np.random.permutation(state_action.index))     # some actions have same value
@@ -97,5 +98,8 @@ class QTable:
             )
 
     def update_episode(self, epi):
-        if epi != 0 and self.epsilon <= 0.99:
-            self.epsilon = self.epsilon + self.diff_epsilon
+        if epi != 0:
+            if self.epsilon <= 0.99:
+                self.epsilon = self.epsilon + self.diff_epsilon
+            else:
+                self.epsilon = 0.99
