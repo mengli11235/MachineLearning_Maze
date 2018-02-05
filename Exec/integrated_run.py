@@ -44,7 +44,7 @@ if __name__ == "__main__":
     maze_index = 1
 
     # base parameter values
-    total_epi = 50000
+    total_epi = 30000
     episodes = 250
     max_steps = 500
     reward_gamma = 0.95
@@ -55,24 +55,24 @@ if __name__ == "__main__":
     parameter_dict = {
         algo_names[0]: [{
             para_names[0]: total_epi,
-            para_names[1]: 350,
-            para_names[2]: 1500,
-            para_names[3]: 0.8,
-            para_names[4]: [0.4, [0.9], 0.9],
+            para_names[1]: 600,
+            para_names[2]: 400,
+            para_names[3]: 0.95,
+            para_names[4]: [0.4, [0.9], 0.99],
             para_names[5]: 0.8
         }],
         algo_names[1]: [{
             para_names[0]: total_epi,
-            para_names[1]: 300,
-            para_names[2]: 500,
+            para_names[1]: 400,
+            para_names[2]: 300,
             para_names[3]: 0.95,
-            para_names[4]: greedy_rule,
-            para_names[5]: 0.8
+            para_names[4]: [0.4, [0.95], 0.85],
+            para_names[5]: 0.9
         }],
         algo_names[2]: [{
             para_names[0]: total_epi,
-            para_names[1]: 180,
-            para_names[2]: 500,
+            para_names[1]: 400,
+            para_names[2]: 1000,
             para_names[3]: 0.95,
             para_names[4]: [0.6, [0.9], 0.9],
             para_names[5]: 0.8
@@ -92,13 +92,11 @@ if __name__ == "__main__":
         # single_run(f2, lmb, maze_index, _parameters[para_names[0]], _parameters[para_names[1]], algo_names[1],
         #            simulation, _parameters[para_names[2]], _parameters[para_names[3]], _parameters[para_names[4]],
         #            _parameters[para_names[5]])
-        #
+
         # _parameters = parameter_dict[algo_names[2]][index]
         # single_run(f3, lmb, maze_index, _parameters[para_names[0]], _parameters[para_names[1]], algo_names[2],
         #            simulation, _parameters[para_names[2]], _parameters[para_names[3]], _parameters[para_names[4]],
         #            _parameters[para_names[5]])
-
-
 
         print("finish lambda", str(lmb))
         # plt.plot(range(len(f1_avg_rw)), f1_avg_rw)

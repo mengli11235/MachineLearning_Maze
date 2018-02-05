@@ -162,11 +162,11 @@ def running(epi, time_in_ms, _is_render, QL, env):
 
 if __name__ == "__main__":
     # set if render the GUI
-    is_render = False
+    is_render = True
     is_demo = False
 
     # set number of runs
-    episodes = 300
+    episodes = 30
     # animation interval
     interval = 0.005
     
@@ -178,8 +178,8 @@ if __name__ == "__main__":
     if is_demo:
         is_render = True
 
-    # maze = MazeSmall(init_pos).init_maze(is_render)
-    maze = MazeMedium(init_pos).init_maze(is_render)
+    maze = MazeSmall(init_pos).init_maze(is_render)
+    # maze = MazeMedium(init_pos).init_maze(is_render)
     # maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate QLearner
@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
     max_reward_coefficient = 0.75
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, max_reward_coefficient)
-    QLearner.set_greedy_rule([0.9], episodes*0.95, 0.9)
+    QLearner.set_greedy_rule([0.9], episodes*0.95, 0.95)
 
     # run the training
     if not is_demo:

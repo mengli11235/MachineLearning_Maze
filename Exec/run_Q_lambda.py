@@ -160,10 +160,10 @@ def running(epi, time_in_ms, _is_render, QL, env):
 
 if __name__ == "__main__":
     # set if render the GUI
-    is_render = False
-    is_demo = False
+    is_render = True
+    is_demo = True
     # set number of uns
-    episodes = 300
+    episodes = 30
     # animation interval
     interval = 0.005
 
@@ -172,14 +172,14 @@ if __name__ == "__main__":
     init_pos = [0, 0]
 
     # maximal number of states
-    max_steps = 1500
+    max_steps = 200
 
     # initiate maze simulator for learning and running
     if is_demo:
         is_render = True
 
-    # maze = MazeSmall(init_pos).init_maze(is_render)
-    maze = MazeMedium(init_pos).init_maze(is_render)
+    maze = MazeSmall(init_pos).init_maze(is_render)
+    # maze = MazeMedium(init_pos).init_maze(is_render)
     # maze = MazeLarge(init_pos).init_maze(is_render)
 
     # initiate QLearner
@@ -196,7 +196,7 @@ if __name__ == "__main__":
     # run the training
     if not is_demo:
         if is_render:
-            maze.after(1, learning(episodes, interval, is_render, QLearner, maze))
+            maze.after(1, learning(episodes, interval, is_render, QLearner, maze, max_steps))
             maze.mainloop()
         else:
             learning(episodes, interval, is_render, QLearner, maze, max_steps)

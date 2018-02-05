@@ -189,11 +189,11 @@ if __name__ == "__main__":
     reward_gamma = 0.95
 
     greedy = 0.4
-    # lambda_val = 0
-    lambda_val = 0.5
+    lambda_val = 0
+    # lambda_val = 0.5
     max_reward_coefficient = 0.75
     SLearner = SarsaLambda(actions, learning_rate, reward_gamma, greedy, lambda_val, max_reward_coefficient)
-    SLearner.set_greedy_rule([0.9], episodes*0.95, 0.9)
+    SLearner.set_greedy_rule([0.9], episodes*0.95, 0.95)
 
     # run the training
     if not is_demo:

@@ -49,8 +49,8 @@ class MazeLarge:
 
         # set chest and its key
         maze.set_key_chest([18, 18], [18, 0], '1', 0, 1500)
-        # maze.set_key_chest([2, 5], [8, 18], '2', 0, 1000)
-        # maze.set_key_chest([14, 1], [4, 14], '3', 0, 500)
+        maze.set_key_chest([2, 5], [8, 18], '2', 0, 1000)
+        maze.set_key_chest([14, 1], [4, 14], '3', 0, 500)
 
         # build the rendered maze
         maze.build_maze()
@@ -85,7 +85,7 @@ class MazeMedium:
 
         # set exit, with certain rewards
         exits = np.array(
-            [[10, 6]],
+            [[8, 6]],
             np.float64)
 
         maze.set_agent()
@@ -99,7 +99,7 @@ class MazeMedium:
             maze.set_fixed_obj(row, 500, True)
 
         # set chest and its key
-        maze.set_key_chest([4, 0], [9, 6], '1', 0, 500)
+        maze.set_key_chest([4, 0], [7, 4], '1', 0, 500)
 
         # build the rendered maze
         maze.build_maze()

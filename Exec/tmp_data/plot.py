@@ -40,10 +40,10 @@ def plot_maze(maze_index):
 
 if __name__ == "__main__":
     csv_names = ["q_lambda_avg_reward", "sarsa_lambda_avg_reward", "qv_lambda_avg_reward"]
-    plot_csv(csv_names)
+    # plot_csv(csv_names)
 
     # plot_maze(0)
     # plot_maze(1)
-    # plot_maze(2)
+    plot_maze(2)
 
 
