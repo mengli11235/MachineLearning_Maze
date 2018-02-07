@@ -1,13 +1,13 @@
 from LearningAlgos.QLearning_RL import QLearningTable
 from MazeEnv.maze_layouts import MazeSmall, MazeLarge, MazeMedium
 import pandas as pd
+import time
+import csv
+import math
 import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib import pyplot as plt
 # import matplotlib.pyplot as plt
-import time
-import csv
-import math
 
 
 def step_counter(_current_array=-1, _length=30):
@@ -101,12 +101,16 @@ def learning(epi, time_in_ms, _is_render, QL, env):
 
     plt.figure(1)
     plt.plot(epo, rewards)
+    plt.title("rewards_epo")
+
     plt.figure(2)
     plt.plot(epo, step_array)
+    plt.title("steps")
+
     plt.figure(3)
     plt.plot(step_array_accu, rewards)
-    # plt.figure(3)
-    # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
+    plt.title("rewards_steps")
+
     plt.show()
 
     if _is_render:
@@ -162,11 +166,11 @@ def running(epi, time_in_ms, _is_render, QL, env):
 
 if __name__ == "__main__":
     # set if render the GUI
-    is_render = True
+    is_render = False
     is_demo = False
 
     # set number of runs
-    episodes = 30
+    episodes = 100
     # animation interval
     interval = 0.005
     
@@ -185,7 +189,7 @@ if __name__ == "__main__":
     # initiate QLearner
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
-    reward_gamma = 0.95
+    reward_gamma = 0.9
     greedy = 0.4
 
     max_reward_coefficient = 0.75

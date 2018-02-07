@@ -1,19 +1,25 @@
 from MazeEnv.maze_layouts_qv import MazeSmallQV, MazeLargeQV, MazeMediumQV
 from LearningAlgos.QV_lambda_RL import QTable, VTable
 import matplotlib.pyplot as plt
-import time
+import time, math
 
 
 def learning(epi, max_steps, time_in_ms, _is_render, QL, VL, env):
     rewards = []
     time_array = []
     epo = []
+    step_array = []
+    per_5 = math.floor(epi / 20)
 
     for episode in range(epi):
         # initiate the agent
         agent = env.reset()
         reward_in_each_epi = 0
         init_time = time.time()
+
+        if episode%per_5 == 0:
+            print("{} %".format((episode/per_5)*5))
+            print()
 
         for step in range(max_steps):
             # fresh env
@@ -27,7 +33,6 @@ def learning(epi, max_steps, time_in_ms, _is_render, QL, VL, env):
             new_state, reward, is_done = env.taking_action(action)
             reward_in_each_epi += reward
 
-
             # RL learn from this transition
             QL.learn(VL, current_state, action, reward, str(new_state), is_done)
             VL.update(current_state, reward, str(new_state), is_done)
@@ -37,15 +42,15 @@ def learning(epi, max_steps, time_in_ms, _is_render, QL, VL, env):
 
             # break while loop when end of this episode
             if is_done:
-                # print(episode/epi)
-                rewards.append(reward_in_each_epi)
-                # print(rewards)
-                time_array.append(format(time.time() - init_time, '.2f'))
-                # print(time_array)
-                epo.append(episode+1)
                 # print(epo)
                 break
-
+        # print(episode/epi)
+        rewards.append(reward_in_each_epi)
+        # print(rewards)
+        time_array.append(format(time.time() - init_time, '.2f'))
+        # print(time_array)
+        epo.append(episode + 1)
+        step_array.append(step)
 
     # end of game
     print('game over')
@@ -53,9 +58,11 @@ def learning(epi, max_steps, time_in_ms, _is_render, QL, VL, env):
         time.sleep(1)
         env.destroy()
 
-    QL.q_table.to_csv("temp_q_table.csv", sep=',', encoding='utf-8')
-    # print(QL.q_table)
+    QL.q_table.to_csv("temp_qv_table.csv", sep=',', encoding='utf-8')
+    plt.figure(1)
     plt.plot(epo, rewards)
+    plt.figure(2)
+    plt.plot(epo, step_array)
     plt.show()
 
 
@@ -64,7 +71,7 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 300
+    episodes = 600
     # animation interval
     interval = 0.005
 
@@ -73,7 +80,7 @@ if __name__ == "__main__":
     init_pos = [0, 0]
 
     # maximal number of states
-    max_steps = 1500
+    max_steps = 400
 
     # initiate maze simulator for learning and running
     if is_demo:
@@ -89,7 +96,7 @@ if __name__ == "__main__":
     learning_rate_q = 0.1
     reward_gamma = 0.95
     greedy = 0.6
-    lambda_v = 0.8
+    lambda_v = 0.5
     QLearner = QTable(actions, learning_rate_q, reward_gamma, greedy)
     Vlearner = VTable(learning_rate_v, reward_gamma, lambda_v)
 

@@ -38,7 +38,6 @@ def learning(epi, time_in_ms, _is_render, QL, env, max_steps):
         agent, cond = env.reset()
         reward_in_each_epi = 0
         init_time = time.time()
-        step = 0
 
         if episode%per_5 == 0:
             print("{} %".format((episode/per_5)*5))
@@ -65,23 +64,21 @@ def learning(epi, time_in_ms, _is_render, QL, env, max_steps):
             agent = new_state
             cond = new_cond
 
-            # count step
-            step = step + 1
-
             # break while loop when end of this episode
             if is_done:
-                rewards.append(reward_in_each_epi)
-                time_array.append(format(time.time() - init_time, '.2f'))
-                step_array.append(step)
-                # step_array = step_counter(step_array)
-                # print(time_array)
-                epo.append(episode+1)
                 if _is_render:
                     # print(episode/epi)
                     print(reward_in_each_epi)
                     print()
                     # print(epo)
                 break
+
+        rewards.append(reward_in_each_epi)
+        time_array.append(format(time.time() - init_time, '.2f'))
+        step_array.append(step)
+        # step_array = step_counter(step_array)
+        # print(time_array)
+        epo.append(episode + 1)
 
     # end of game
     print('game over')
@@ -160,10 +157,12 @@ def running(epi, time_in_ms, _is_render, QL, env):
 
 if __name__ == "__main__":
     # set if render the GUI
-    is_render = True
-    is_demo = True
-    # set number of uns
-    episodes = 30
+
+    is_render = False
+    is_demo = False
+    # set number of runs
+    episodes = 300
+
     # animation interval
     interval = 0.005
 
@@ -172,7 +171,8 @@ if __name__ == "__main__":
     init_pos = [0, 0]
 
     # maximal number of states
-    max_steps = 200
+
+    max_steps = 400
 
     # initiate maze simulator for learning and running
     if is_demo:
@@ -186,12 +186,12 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.95
-    greedy = 0.4
+    greedy = 0.6
     from_lambda_val = 0.5
     to_lambda_val = 0.5
-    max_reward_coefficient = 0.75
+    max_reward_coefficient = 0.8
     QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, from_lambda_val, to_lambda_val, max_reward_coefficient)
-    QLearner.set_greedy_rule([0.9], episodes*0.95, 0.9)
+    QLearner.set_greedy_rule([0.9], episodes*0.95, 0.61)
 
     # run the training
     if not is_demo:

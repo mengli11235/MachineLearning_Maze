@@ -71,7 +71,7 @@ class _SarsaLambda:
                 epi = epi - 1
 
                 # calculate average reward per n steps
-                if len(rewards_memory) == 5000 or is_done:
+                if len(rewards_memory) == 500:
                     step_reward.append(statistics.mean(rewards_memory))
                     rewards_memory = []
 
@@ -108,11 +108,11 @@ class _SarsaLambda:
         #     SL.q_table_category[key].to_csv("tmp_data/temp_sarsa_table_" + key + ".csv", sep=',', encoding='utf-8')
             # print(SL.q_table_category[key])
 
-        plt.figure(1)
-        plt.plot(epo, rewards)
+        # plt.figure(1)
+        # plt.plot(epo, rewards)
         # plt.figure(2)
         # plt.plot(epo, step_array)
-        plt.show()
+        # plt.show()
 
         return step_reward
 

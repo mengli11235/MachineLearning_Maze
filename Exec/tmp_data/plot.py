@@ -11,8 +11,8 @@ def plot_csv(csv_name):
     fig, ax = plt.subplots()
     try:
         for name in csv_names:
-            # for i in [0, 1, 2]:
-            for i in [0]:
+            for i in [0, 1, 2]:
+            # for i in [0]:
                 with open(name + str(i) + ".csv", 'r') as f:
                     reader = csv.reader(f)
                     the_list = list(reader)[0]
@@ -20,7 +20,7 @@ def plot_csv(csv_name):
                     ax.plot(range(len(the_list)), the_list, label=name + "-" + str(i))
     except Exception:
         pass
-    legend = ax.legend(loc='lower right', shadow=True)
+    legend = ax.legend(loc='upper left', shadow=True)
     plt.show()
 
 
@@ -39,8 +39,16 @@ def plot_maze(maze_index):
         time.sleep(0.05)
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     csv_names = ["q_lambda_avg_reward", "sarsa_lambda_avg_reward", "qv_lambda_avg_reward"]
     # plot_csv(csv_names)
+=======
+    # csv_names = ["q_lambda_avg_reward", "sarsa_lambda_avg_reward", "qv_lambda_avg_reward"]
+    # csv_names = ["q_lambda_avg_reward", "sarsa_lambda_avg_reward", "qv_lambda_avg_reward"]
+    # csv_names = ["medium_maze/q_lambda_avg_reward", "medium_maze/sarsa_lambda_avg_reward"]
+    csv_names = ["small_maze/q_lambda_avg_reward", "small_maze/sarsa_lambda_avg_reward"]
+    plot_csv(csv_names)
+>>>>>>> eba6ddac02e535b5cb42e9f191bb86b885a81ced
 
     # plot_maze(0)
     # plot_maze(1)

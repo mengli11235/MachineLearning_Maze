@@ -64,9 +64,10 @@ class QLambda:
                 epi = epi - 1
 
                 # calculate average reward per n steps
-                if len(rewards_memory) == 5000 or is_done:
+                if len(rewards_memory) == 500:
                     step_reward.append(statistics.mean(rewards_memory))
                     rewards_memory = []
+                    # print(step_reward)
 
                 # break while loop when end of this episode
                 if is_done:
@@ -110,13 +111,13 @@ class QLambda:
 
 
         # plt.plot(range(len(step_reward)), step_reward)
-        plt.figure(1)
-        plt.plot(epo, rewards)
+        # plt.figure(1)
+        # plt.plot(epo, rewards)
         # plt.figure(2)
         # plt.plot(epo, step_array)
         # plt.figure(3)
         # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
-        plt.show()
+        # plt.show()
 
         return step_reward
 
