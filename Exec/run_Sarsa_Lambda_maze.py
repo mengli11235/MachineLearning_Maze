@@ -102,13 +102,13 @@ def learning(total_steps, time_in_ms, _is_render, SL, env, max_steps):
     plt.plot(epo[:-1], rewards[:-1])
     plt.ylabel("rewards")
     plt.xlabel("epoches")
-    plt.title("small maze rewards: Sarsa_lambda(lambda=0.5)")
+    plt.title("small maze rewards: Sarsa_lambda(lambda=0.8)")
 
     plt.figure(2)
     plt.plot(epo[:-1], step_array[:-1])
     plt.ylabel("steps")
     plt.xlabel("epoches")
-    plt.title("small maze steps: Sarsa_lambda(lambda=0.5)")
+    plt.title("small maze steps: Sarsa_lambda(lambda=0.8)")
     plt.show()
 
     if _is_render:
@@ -187,11 +187,11 @@ if __name__ == "__main__":
     # set number of runs
     # episodes = 1200
     # set number of total steps
-    total_steps = 5000  # 60000 for medium, 5000 for simple
+    total_steps = 5000  # 60000 for medium, 5000(0.5,0.8), 6000(0) for simple
     # animation interval
     interval = 0.005
     # maximal number of states
-    max_steps = 150  # 1000 for medium, 150 for simple
+    max_steps = 150  # 1000 for medium, 150(0.5), 200(0) for simple
 
     # initial position of the agent
     # all position count from 0
@@ -211,8 +211,7 @@ if __name__ == "__main__":
     reward_gamma = 0.95
     greedy = 0.9
 
-    # lambda_val = 0
-    lambda_val = 0.5
+    lambda_val = 0.8
     max_reward_coefficient = 0.75
     SLearner = SarsaLambda(actions, learning_rate, reward_gamma, greedy, lambda_val, max_reward_coefficient)
     SLearner.set_greedy_rule([0.9], 50, greedy)
