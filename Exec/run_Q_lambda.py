@@ -10,43 +10,32 @@ import csv
 import math
 
 
-def step_counter(_current_array=-1, _length=30):
-    if _current_array == -1:
-        return _current_array
-    else:
-        _sum = 0
-        if len(_current_array) >= _length:
-            start_index = len(_current_array) - _length
-            for x in range(0, _length):
-                _sum += _current_array[start_index + x]
-            new_mean = _sum/_length
-            _current_array[start_index] = new_mean
-            return _current_array
-        return _current_array
-
-
-def learning(epi, time_in_ms, _is_render, QL, env, max_steps):
+def learning(total_steps, time_in_ms, _is_render, QL, env, max_steps):
+    episode = 0
+    step_counter = 0
     rewards = []
     time_array = []
     epo = []
     step_array = []
     training_time = time.time()
-    per_5 = math.floor(epi/20)
+    per_5 = math.floor(total_steps/20)
 
-    for episode in range(epi):
+    while True:
         # initiate the agent
         agent, cond = env.reset()
         reward_in_each_epi = 0
         init_time = time.time()
-
-        if episode%per_5 == 0:
-            print("{} %".format((episode/per_5)*5))
-            print()
+        force_exit = False
 
         # initial all zero eligibility trace
         QL.reset_trace()
 
         for step in range(max_steps):
+            step_counter = step_counter + 1
+            if step_counter % per_5 == 0:
+                print("{} %".format((step_counter / per_5) * 5))
+                print()
+
             # fresh env
             env.render(time_in_ms)
 
@@ -57,15 +46,17 @@ def learning(epi, time_in_ms, _is_render, QL, env, max_steps):
             new_state, new_cond, reward, is_done = env.taking_action(action)
             reward_in_each_epi += reward
 
+            if step == max_steps - 1:
+                force_exit = True
             # RL learn from this transition
-            QL.learn(agent, cond, action, reward, new_state, new_cond, is_done)
+            QL.learn(agent, cond, action, reward, new_state, new_cond, is_done, force_exit)
 
             # swap observation
             agent = new_state
             cond = new_cond
 
             # break while loop when end of this episode
-            if is_done:
+            if is_done or step_counter >= total_steps:
                 if _is_render:
                     # print(episode/epi)
                     print(reward_in_each_epi)
@@ -73,12 +64,16 @@ def learning(epi, time_in_ms, _is_render, QL, env, max_steps):
                     # print(epo)
                 break
 
+        episode = episode + 1
         rewards.append(reward_in_each_epi)
         time_array.append(format(time.time() - init_time, '.2f'))
         step_array.append(step)
-        # step_array = step_counter(step_array)
         # print(time_array)
         epo.append(episode + 1)
+
+        if step_counter >= total_steps:
+            # print(epo)
+            break
 
     # end of game
     print('game over')
@@ -96,12 +91,19 @@ def learning(epi, time_in_ms, _is_render, QL, env, max_steps):
         QL.q_table_category[key].to_csv("tmp_data/temp_q_lambda_" + key + ".csv", sep=',', encoding='utf-8')
         # print(QL.q_table_category[key])
 
+    axes = plt.gca()
+    axes.set_ylim([-1000, 1000])
     plt.figure(1)
-    plt.plot(epo, rewards)
+    plt.plot(epo[:-1], rewards[:-1])
+    plt.ylabel("rewards")
+    plt.xlabel("epoches")
+    plt.title("small maze rewards: Q_lambda(lambda=0.5)")
+
     plt.figure(2)
-    plt.plot(epo, step_array)
-    # plt.figure(3)
-    # plt.plot(epo, [r/s for r, s in zip(rewards, step_array)])
+    plt.plot(epo[:-1], step_array[:-1])
+    plt.ylabel("steps")
+    plt.xlabel("epoches")
+    plt.title("small maze steps: Q_lambda(lambda=0.5)")
     plt.show()
 
     if _is_render:
@@ -161,18 +163,19 @@ if __name__ == "__main__":
     is_render = False
     is_demo = False
     # set number of runs
-    episodes = 300
+
+    # episodes = 1200
+    # set number of total steps
+    total_steps = 5000  # 60000 for medium, 5000 for simple
 
     # animation interval
     interval = 0.005
+    # maximal number of states
+    max_steps = 150  # 1000 for medium, 150 for simple
 
     # initial position of the agent
     # all position count from 0
     init_pos = [0, 0]
-
-    # maximal number of states
-
-    max_steps = 400
 
     # initiate maze simulator for learning and running
     if is_demo:
@@ -186,20 +189,19 @@ if __name__ == "__main__":
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.95
-    greedy = 0.6
-    from_lambda_val = 0.5
-    to_lambda_val = 0.5
-    max_reward_coefficient = 0.8
-    QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, from_lambda_val, to_lambda_val, max_reward_coefficient)
-    QLearner.set_greedy_rule([0.9], episodes*0.95, 0.61)
+    greedy = 0.9
+    lambda_val = 0.5
+    max_reward_coefficient = 0.75
+    QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, lambda_val, max_reward_coefficient)
+    QLearner.set_greedy_rule([0.9], 50, greedy)
 
     # run the training
     if not is_demo:
         if is_render:
-            maze.after(1, learning(episodes, interval, is_render, QLearner, maze, max_steps))
+            maze.after(1, learning(total_steps, interval, is_render, QLearner, maze, max_steps))
             maze.mainloop()
         else:
-            learning(episodes, interval, is_render, QLearner, maze, max_steps)
+            learning(total_steps, interval, is_render, QLearner, maze, max_steps)
     # run the simulation of result
     else:
         # Q decision with 99% greedy strategy

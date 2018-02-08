@@ -4,13 +4,13 @@ import math
 
 
 class QLearningTable:
-    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, from_lambda_val=0.9, to_lambda_val=0.9, max_reward_coefficient=0.9):
+    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, lambda_val=0.5, max_reward_coefficient=0.9):
         self.actions = actions  # a list
         self.lr = learning_rate
         self.gamma = reward_decay
         self.global_e_greedy = e_greedy
-        self.lambda_ = from_lambda_val if from_lambda_val <= 0.9 else 0.9
-        self.lambda_to = to_lambda_val if to_lambda_val <= 0.9 else 0.9
+        self.lambda_ = lambda_val if lambda_val <= 0.9 else 0.9
+        self.lambda_to = lambda_val if lambda_val <= 0.9 else 0.9
         self.greedy_dict = {}
         self.agent_extra_state = ""
         self.decay_count = 0
@@ -29,7 +29,7 @@ class QLearningTable:
         self.epoch_to_update = []
         for ind_greedy in greedy_rate:
             rounds = math.ceil(math.log(target / base, 2 - ind_greedy))
-            epos = math.floor(episode/rounds)
+            epos = 0 if rounds <= 0 else math.floor(episode/rounds)
             epos = epos if epos > 0 else 1
             self.epoch_to_update.append(epos)
         self.greedy_rate = greedy_rate
@@ -113,10 +113,10 @@ class QLearningTable:
             action = np.random.choice(self.actions)
         return int(action)
 
-    def learn(self, _s, extra_s, a, r, _s_, extra_state, is_done):
+    def learn(self, _s, extra_s, a, r, _s_, extra_state, is_done, force_exit):
         reward_coefficient = 1
         virtual_done = False
-        if is_done:
+        if is_done or force_exit:
             self.agent_extra_state = ""
         elif extra_state != self.agent_extra_state:
             if extra_state != '[]_[]':
@@ -137,7 +137,7 @@ class QLearningTable:
             # print(reward_coefficient)
             # print(self.max_reward)
             # print(q_target)
-        elif not is_done:
+        elif force_exit or (not is_done):
             q_target = r + self.gamma * self.q_table_category[extra_state].ix[s_, :].max()  # next state is not terminal
         else:
             q_target = r  # next state is terminal

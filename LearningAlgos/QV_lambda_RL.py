@@ -11,8 +11,12 @@ class VTable:
         self.lr = learning_rate_v
         self.gamma = reward_decay
         self.lambda_v = lambda_v
-        self.traces = pd.DataFrame(columns=list(range(1)), dtype=np.float64)         # matrix of eligibility traces
-    
+        self.traces = pd.DataFrame(columns=list(range(1)), dtype=np.float64)              # matrix of eligibility traces
+
+    def set_prior_qtable(self, df_vtable):
+        self.traces = df_vtable
+
+
     def update(self, s, r, s_, is_done):
         self.check_state_exist(s)
         self.check_state_exist(s_)
@@ -51,13 +55,16 @@ class VTable:
 
 class QTable:
 
-    def __init__(self, actions, learning_rate, reward_decay, e_greedy, epi):
+    def __init__(self, actions, learning_rate, reward_decay, e_greedy, max_reward_coefficient):
         self.actions = actions  # a list
         self.lr = learning_rate
         self.gamma = reward_decay
         self.epsilon = e_greedy
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
-        self.diff_epsilon = (0.99 - self.epsilon)/epi
+        self.diff_epsilon = 0
+        self.max_reward = {}
+        self.max_reward_coefficient = 0.999 if max_reward_coefficient >= 1 else max_reward_coefficient
+        self.agent_extra_state = ""
 
     def set_prior_qtable(self, df_qtable):
         self.q_table = df_qtable
@@ -76,15 +83,61 @@ class QTable:
             action = np.random.choice(self.actions)
         return int(action)
 
-    def learn(self, v_table, s, a, r, s_, is_done):
+    def learn(self, v_table, s, a, r, s_, is_done, force_exit):
+        extra_state = str(s[2:4])
+        extra_newstate = str(s_[2:4])
+        reward_coefficient = 1
+        virtual_done = False
+        if is_done or force_exit:
+            self.agent_extra_state = ""
+        elif extra_newstate != self.agent_extra_state:
+            if extra_newstate != "[0 0]":
+                virtual_done = True
+            # self.update_episode(extra_newstate)
+            self.agent_extra_state = extra_newstate
+
+
+        s = str(s)
+        s_ = str(s_)
         self.check_state_exist(s_)
         v_table.check_state_exist(s_)
         q_predict = self.q_table.ix[s, a]
-        if not is_done:
+
+        if virtual_done:
+            next_expectation = 0 if extra_newstate not in self.max_reward else self.max_reward[extra_newstate]
+            q_target = r + next_expectation
+            reward_coefficient = self.check_max_reward(extra_state, q_target)
+            # print(self.max_reward)
+            # print(q_target)
+        elif force_exit or (not is_done):
             q_target = r + self.gamma * v_table.v.ix[s_, 0]  # next state is not terminal
         else:
             q_target = r  # next state is terminal
-        self.q_table.ix[s, a] += self.lr * (q_target - q_predict)  # update
+            reward_coefficient = self.check_max_reward(extra_state, q_target)
+            # print(q_target)
+
+        self.q_table.ix[s, a] += self.lr * (q_target - q_predict)*reward_coefficient  # update
+
+    def check_max_reward(self, state_key, r):
+        # print(self.max_reward)
+        # print(r)
+        # print()
+        if r <= 0:
+            return 1
+
+        if state_key not in self.max_reward:
+            self.max_reward[state_key] = r
+            return 1
+        else:
+            max_val = self.max_reward[state_key]
+            max_reward_coefficient = self.max_reward_coefficient
+            if max_val > r:
+                std_unit = max_reward_coefficient * (1 - max_reward_coefficient) * max_val
+                se = (r - max_val * max_reward_coefficient) / std_unit
+                return se
+            else:
+                self.max_reward[state_key] = r
+                return 1
 
     def check_state_exist(self, state):
         if state not in self.q_table.index:
