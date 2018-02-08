@@ -180,11 +180,11 @@ if __name__ == "__main__":
     # set number of runs
     # episodes = 1200
     # set number of total steps
-    total_steps = 150000  # 300000 for medium, 5000 for simple
+    total_steps = 60000  # 60000 for medium, 5000 for simple
     # animation interval
     interval = 0.005
     # maximal number of states
-    max_steps = 1000  # 400 for medium, 150 for simple
+    max_steps = 1000  # 1000 for medium, 150 for simple
 
     # initial position of the agent
     # all position count from 0

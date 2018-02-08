@@ -4,13 +4,13 @@ import math
 
 
 class QLearningTable:
-    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, from_lambda_val=0.9, to_lambda_val=0.9, max_reward_coefficient=0.9):
+    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9, lambda_val=0.5, max_reward_coefficient=0.9):
         self.actions = actions  # a list
         self.lr = learning_rate
         self.gamma = reward_decay
         self.global_e_greedy = e_greedy
-        self.lambda_ = from_lambda_val if from_lambda_val <= 0.9 else 0.9
-        self.lambda_to = to_lambda_val if to_lambda_val <= 0.9 else 0.9
+        self.lambda_ = lambda_val if lambda_val <= 0.9 else 0.9
+        self.lambda_to = lambda_val if lambda_val <= 0.9 else 0.9
         self.greedy_dict = {}
         self.agent_extra_state = ""
         self.decay_count = 0

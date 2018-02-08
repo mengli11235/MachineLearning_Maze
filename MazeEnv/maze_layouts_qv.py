@@ -80,7 +80,7 @@ class MazeMediumQV:
 
         # set pits (extra cost when stepping on it)
         pits = np.array(
-            [[8, 4]],
+            [[8, 4], [6, 7]],
             np.float64)
 
         # set exit, with certain rewards

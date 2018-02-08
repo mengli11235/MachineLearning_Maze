@@ -159,11 +159,11 @@ if __name__ == "__main__":
     # set number of runs
     # episodes = 1200
     # set number of total steps
-    total_steps = 150000  # 300000 for medium, 5000 for simple
+    total_steps = 60000  # 60000 for medium, 5000 for simple
     # animation interval
     interval = 0.005
     # maximal number of states
-    max_steps = 1000  # 400 for medium, 150 for simple
+    max_steps = 1000  # 1000 for medium, 150 for simple
 
     # initial position of the agent
     # all position count from 0
@@ -182,10 +182,9 @@ if __name__ == "__main__":
     learning_rate = 0.05
     reward_gamma = 0.95
     greedy = 0.7
-    from_lambda_val = 0.5
-    to_lambda_val = 0.5
+    lambda_val = 0.5
     max_reward_coefficient = 0.75
-    QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, from_lambda_val, to_lambda_val, max_reward_coefficient)
+    QLearner = QLearningTable(actions, learning_rate, reward_gamma, greedy, lambda_val, max_reward_coefficient)
     QLearner.set_greedy_rule([0.9], 50, greedy)
 
     # run the training
