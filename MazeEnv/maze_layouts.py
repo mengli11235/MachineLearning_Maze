@@ -49,7 +49,7 @@ class MazeLarge:
 
         # set chest and its key
         maze.set_key_chest([18, 18], [18, 0], '1', 0, 1500)
-        # maze.set_key_chest([2, 5], [8, 18], '2', 0, 1000)
+        maze.set_key_chest([2, 5], [8, 18], '2', 0, 1000)
         # maze.set_key_chest([14, 1], [4, 14], '3', 0, 500)
 
         # build the rendered maze
@@ -80,7 +80,7 @@ class MazeMedium:
 
         # set pits (extra cost when stepping on it)
         pits = np.array(
-            [[8, 4], [6, 7]],
+            [[8, 4]],
             np.float64)
 
         # set exit, with certain rewards
@@ -93,13 +93,13 @@ class MazeMedium:
         for row in walls:
             maze.set_wall(row, -3, False)
         for row in pits:
-            maze.set_fixed_obj(row, -250, False)
+            maze.set_fixed_obj(row, -150, False)
         for row in exits:
             # You might need to change set_fixed_obj() function if you change the reward for exit
-            maze.set_fixed_obj(row, 500, True)
+            maze.set_fixed_obj(row, 300, True)
 
         # set chest and its key
-        maze.set_key_chest([4, 0], [7, 4], '1', 0, 500)
+        maze.set_key_chest([4, 0], [7, 4], '1', 0, 700)
 
         # build the rendered maze
         maze.build_maze()
@@ -148,7 +148,7 @@ class MazeSmall:
             maze.set_fixed_obj(row, 50, True)
 
         # set chest and its key
-        maze.set_key_chest([0, 5], [8, 5], '1', 0, 50)
+        # maze.set_key_chest([0, 5], [8, 5], '1', 0, 50)
 
         # build the rendered maze
         maze.build_maze()
