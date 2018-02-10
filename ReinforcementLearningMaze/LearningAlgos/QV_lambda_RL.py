@@ -14,8 +14,8 @@ class VTable:
         self.traces = pd.DataFrame(columns=list(range(1)), dtype=np.float64)              # matrix of eligibility traces
 
     def set_prior_qtable(self, df_vtable):
+        # load previously trained values
         self.traces = df_vtable
-
 
     def update(self, s, r, s_, is_done):
         self.check_state_exist(s)
@@ -67,6 +67,7 @@ class QTable:
         self.agent_extra_state = ""
 
     def set_prior_qtable(self, df_qtable):
+        # load previously trained values
         self.q_table = df_qtable
 
     def choose_action(self, observation):
@@ -86,8 +87,11 @@ class QTable:
     def learn(self, v_table, s, a, r, s_, is_done, force_exit):
         extra_state = str(s[2:4])
         extra_newstate = str(s_[2:4])
+        # initialize variables
         reward_coefficient = 1
         virtual_done = False
+
+        # if the additional state changed (e.g. acquiring key or chest), let virtual_done be True
         if is_done or force_exit:
             self.agent_extra_state = ""
         elif extra_newstate != self.agent_extra_state:
@@ -96,7 +100,6 @@ class QTable:
             # self.update_episode(extra_newstate)
             self.agent_extra_state = extra_newstate
 
-
         s = str(s)
         s_ = str(s_)
         self.check_state_exist(s_)
@@ -104,24 +107,24 @@ class QTable:
         q_predict = self.q_table.ix[s, a]
 
         if virtual_done:
+            # additional state changed
             next_expectation = 0 if extra_newstate not in self.max_reward else self.max_reward[extra_newstate]
             q_target = r + next_expectation
             reward_coefficient = self.check_max_reward(extra_state, q_target)
-            # print(self.max_reward)
-            # print(q_target)
         elif force_exit or (not is_done):
-            q_target = r + self.gamma * v_table.v.ix[s_, 0]  # next state is not terminal
+            q_target = r + self.gamma * v_table.v.ix[s_, 0]  # next state is not exit
         else:
-            q_target = r  # next state is terminal
+            q_target = r  # next state is exit
             reward_coefficient = self.check_max_reward(extra_state, q_target)
-            # print(q_target)
 
-        self.q_table.ix[s, a] += self.lr * (q_target - q_predict)*reward_coefficient  # update
+        self.q_table.ix[s, a] += self.lr * (q_target - q_predict)*reward_coefficient
 
     def check_max_reward(self, state_key, r):
-        # print(self.max_reward)
-        # print(r)
-        # print()
+        # based on the max_reward_coefficient, let smaller reward of "done" be negative,
+        # e.g. if max reward = 100, max_reward_coefficient = 0.75
+        # if current reward = 75, 0 will be returned; current reward > 75, positive value will be returned;
+        # current reward < 75, negative value will be returned and let that step be like a penalty
+
         if r <= 0:
             return 1
 
@@ -140,6 +143,7 @@ class QTable:
                 return 1
 
     def check_state_exist(self, state):
+        # check if the upcoming state exist before storing values, if not, create new one
         if state not in self.q_table.index:
             # append new state to q table
             self.q_table = self.q_table.append(
@@ -151,6 +155,7 @@ class QTable:
             )
 
     def update_episode(self, epi):
+        # use greedy rules to let greedy increase gradually during the learning (not applied in the results)
         if epi != 0:
             if self.epsilon <= 0.99:
                 self.epsilon = self.epsilon + self.diff_epsilon

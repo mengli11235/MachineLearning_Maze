@@ -3,6 +3,7 @@ import time
 import tkinter as tk
 
 
+# basically this is almost identical to the maze_env, see maze_env for more details
 class MazeSimulator(tk.Tk, object):
     step_penalty = 0
     pixel = 40

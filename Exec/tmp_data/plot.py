@@ -38,20 +38,16 @@ def plot_maze(maze_index):
         maze.render(0.05)
         time.sleep(0.05)
 
+
 if __name__ == "__main__":
-<<<<<<< HEAD
-    csv_names = ["q_lambda_avg_reward", "sarsa_lambda_avg_reward", "qv_lambda_avg_reward"]
-    # plot_csv(csv_names)
-=======
     # csv_names = ["q_lambda_avg_reward", "sarsa_lambda_avg_reward", "qv_lambda_avg_reward"]
     # csv_names = ["q_lambda_avg_reward", "sarsa_lambda_avg_reward", "qv_lambda_avg_reward"]
     # csv_names = ["medium_maze/q_lambda_avg_reward", "medium_maze/sarsa_lambda_avg_reward"]
     csv_names = ["small_maze/q_lambda_avg_reward", "small_maze/sarsa_lambda_avg_reward"]
-    plot_csv(csv_names)
->>>>>>> eba6ddac02e535b5cb42e9f191bb86b885a81ced
+    # plot_csv(csv_names)
 
     # plot_maze(0)
-    # plot_maze(1)
-    plot_maze(2)
+    plot_maze(1)
+    # plot_maze(2)
 
 

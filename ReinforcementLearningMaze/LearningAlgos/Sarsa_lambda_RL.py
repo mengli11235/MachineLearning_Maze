@@ -19,9 +19,11 @@ class SarsaLambda:
         self.eligibility_trace_category = {}
 
     def set_prior_qtable(self, key, df_qtable):
+        # load previously trained values
         self.q_table_category[key] = df_qtable
 
     def set_greedy_rule(self, greedy_rate, episode, max_greedy):
+        # set greedy rules to let greedy increase gradually during the learning (not applied in the results)
         base = self.global_e_greedy
         target = max_greedy
         self.epoch_to_update = []
@@ -34,6 +36,7 @@ class SarsaLambda:
         self.max_greedy = max_greedy
 
     def update_episode(self, key):
+        # use greedy rules to let greedy increase gradually during the learning (not applied in the results)
         if key not in self.greedy_dict:
             self.greedy_dict[key] = [1, self.global_e_greedy, self.epoch_to_update[self.decay_count], self.greedy_rate[self.decay_count]]
             if len(self.epoch_to_update) > self.decay_count + 1:
@@ -56,6 +59,7 @@ class SarsaLambda:
             self.greedy_dict[key][1] = epsilon
 
     def check_state_exist(self, extra_state, state):
+        # check if the upcoming state exist before storing values, if not, create new one
         if extra_state not in self.q_table_category:
             q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
             q_table = q_table.append(
@@ -105,8 +109,11 @@ class SarsaLambda:
         return int(action)
 
     def learn(self, _s, a, r, _s_, a_, extra_s, extra_state, is_done, force_exit):
+        # initialize variables
         reward_coefficient = 1
         virtual_done = False
+
+        # if the additional state changed (e.g. acquiring key or chest), let virtual_done be True
         if is_done or force_exit:
             self.agent_extra_state = ""
         elif extra_state != self.agent_extra_state:
@@ -122,17 +129,15 @@ class SarsaLambda:
         q_predict = self.q_table_category[extra_s].loc[s, a]
 
         if virtual_done:
+            # additional state changed
             next_expectation = 0 if extra_state not in self.max_reward else self.max_reward[extra_state]
             q_target = r + next_expectation
             reward_coefficient = self.check_max_reward(extra_s, q_target)
-            # print(self.max_reward)
-            # print(q_target)
         elif force_exit or (not is_done):
-            q_target = r + self.gamma * self.q_table_category[extra_state].loc[s_, a_]  # next state is not terminal
+            q_target = r + self.gamma * self.q_table_category[extra_state].loc[s_, a_]  # next state is not exit
         else:
-            q_target = r  # next state is terminal
+            q_target = r  # next state is exit
             reward_coefficient = self.check_max_reward(extra_s, q_target)
-            # print(q_target)
         error = q_target - q_predict
 
         eligibility = self.eligibility_trace_category[extra_s]
@@ -149,9 +154,11 @@ class SarsaLambda:
         self.eligibility_trace_category[extra_s] = eligibility
 
     def check_max_reward(self, state_key, r):
-        # print(self.max_reward)
-        # print(r)
-        # print()
+        # based on the max_reward_coefficient, let smaller reward of "done" be negative,
+        # e.g. if max reward = 100, max_reward_coefficient = 0.75
+        # if current reward = 75, 0 will be returned; current reward > 75, positive value will be returned;
+        # current reward < 75, negative value will be returned and let that step be like a penalty
+
         if r <= 0:
             return 1
 

@@ -11,6 +11,7 @@ import math
 
 
 def learning(total_steps, time_in_ms, _is_render, SL, env, max_steps):
+    # store the data of learning process for the plotting later
     episode = 0
     step_counter = 0
     rewards = []
@@ -23,18 +24,16 @@ def learning(total_steps, time_in_ms, _is_render, SL, env, max_steps):
 
     while True:
         force_exit = False
-        # initial observation
-        # observation = env.reset()
+
+        # initialize the agent
+        agent, cond = env.reset()
         reward_in_epoch = 0
         init_time = time.time()
 
-        # initial observation
-        agent, cond = env.reset()
-
-        # SL choose action based on observation
+        # choose action based on current state
         action = SL.choose_action(agent, cond)
 
-        # initial all zero eligibility trace
+        # reset eligibility trace to zero
         SL.reset_trace()
 
         for step in range(max_steps):
@@ -43,22 +42,23 @@ def learning(total_steps, time_in_ms, _is_render, SL, env, max_steps):
                 print("{} %".format((step_counter / per_5) * 5))
                 print()
 
-            # fresh env
+            # refresh rendering
             env.render(time_in_ms)
 
-            # SL take action and get next observation and reward
+            # take action and get next state and reward
             new_state, new_cond, reward, is_done = env.taking_action(action)
             reward_in_epoch += reward
 
-            # SL choose action based on next observation
+            # choose action based on next state
             action_ = SL.choose_action(new_state, new_cond)
 
             if step == max_steps - 1:
                 force_exit = True
-            # SL learn from this transition (s, a, r, s, a) ==> Sarsa
+
+            # learning
             SL.learn(agent, action, reward, new_state, action_, cond, new_cond, is_done, force_exit)
 
-            # swap observation and action
+            # assign to update variables
             agent = new_state
             cond = new_cond
             action = action_
@@ -66,7 +66,7 @@ def learning(total_steps, time_in_ms, _is_render, SL, env, max_steps):
             # count step
             totalStep = totalStep + 1
 
-            # break while loop when end of this episode
+            # break the loop
             if is_done or step_counter >= total_steps:
                 break
 
@@ -77,7 +77,6 @@ def learning(total_steps, time_in_ms, _is_render, SL, env, max_steps):
         epo.append(episode + 1)
 
         if step_counter >= total_steps:
-            # print(epo)
             break
 
     # end of game
@@ -88,14 +87,15 @@ def learning(total_steps, time_in_ms, _is_render, SL, env, max_steps):
     h, m = divmod(m, 60)
     print("Total training time: %d hr %02d min %02d sec" % (h, m, s))
 
+    # store the table as csv
     sarsa_keys = SL.q_table_category.keys()
     with open('tmp_data/sarsa_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
         wr = csv.writer(f, quoting=csv.QUOTE_ALL)
         wr.writerow(sarsa_keys)
     for key in sarsa_keys:
         SL.q_table_category[key].to_csv("tmp_data/temp_sarsa_table_" + key + ".csv", sep=',', encoding='utf-8')
-        # print(SL.q_table_category[key])
 
+    # plot the learning progress
     axes = plt.gca()
     axes.set_ylim([-1000, 1000])
     plt.figure(1)
@@ -181,11 +181,12 @@ def running(epi, time_in_ms, _is_render, SL, env):
 
 
 if __name__ == "__main__":
-    # set if render the GUI
+    # set if render the GUI of learning
     is_render = False
+
+    # when is_demo set as True, no learning but running GUI to show the learning outcome
     is_demo = False
-    # set number of runs
-    # episodes = 1200
+
     # set number of total steps
     total_steps = 5000  # 60000 for medium, 5000(0.5,0.8), 6000(0) for simple
     # animation interval
@@ -203,9 +204,8 @@ if __name__ == "__main__":
 
     maze = MazeSmall(init_pos).init_maze(is_render)
     # maze = MazeMedium(init_pos).init_maze(is_render)
-    # maze = MazeLarge(init_pos).init_maze(is_render)
 
-    # initiate SarsaLearner
+    # initialize SarsaLearner
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.95

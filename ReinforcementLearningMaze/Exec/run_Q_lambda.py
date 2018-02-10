@@ -11,6 +11,7 @@ import math
 
 
 def learning(total_steps, time_in_ms, _is_render, QL, env, max_steps):
+    # store the data of learning process for the plotting later
     episode = 0
     step_counter = 0
     rewards = []
@@ -21,13 +22,13 @@ def learning(total_steps, time_in_ms, _is_render, QL, env, max_steps):
     per_5 = math.floor(total_steps/20)
 
     while True:
-        # initiate the agent
+        # initialize the agent
         agent, cond = env.reset()
         reward_in_each_epi = 0
         init_time = time.time()
         force_exit = False
 
-        # initial all zero eligibility trace
+        # reset eligibility trace to zero
         QL.reset_trace()
 
         for step in range(max_steps):
@@ -36,43 +37,39 @@ def learning(total_steps, time_in_ms, _is_render, QL, env, max_steps):
                 print("{} %".format((step_counter / per_5) * 5))
                 print()
 
-            # fresh env
+            # refresh rendering
             env.render(time_in_ms)
 
-            # RL choose action based on observation
+            # choose action based on current state
             action = QL.choose_action(agent, cond)
 
-            # RL take action and get next observation and reward
+            # take action and get next state and reward
             new_state, new_cond, reward, is_done = env.taking_action(action)
             reward_in_each_epi += reward
 
             if step == max_steps - 1:
                 force_exit = True
-            # RL learn from this transition
+            # learning
             QL.learn(agent, cond, action, reward, new_state, new_cond, is_done, force_exit)
 
-            # swap observation
+            # assign to update variables
             agent = new_state
             cond = new_cond
 
-            # break while loop when end of this episode
+            # break the loop
             if is_done or step_counter >= total_steps:
                 if _is_render:
-                    # print(episode/epi)
                     print(reward_in_each_epi)
                     print()
-                    # print(epo)
                 break
 
         episode = episode + 1
         rewards.append(reward_in_each_epi)
         time_array.append(format(time.time() - init_time, '.2f'))
         step_array.append(step)
-        # print(time_array)
         epo.append(episode + 1)
 
         if step_counter >= total_steps:
-            # print(epo)
             break
 
     # end of game
@@ -83,14 +80,15 @@ def learning(total_steps, time_in_ms, _is_render, QL, env, max_steps):
     h, m = divmod(m, 60)
     print("Total training time: %d hr %02d min %02d sec" % (h, m, s))
 
+    # store the table as csv
     qtable_keys = QL.q_table_category.keys()
     with open('tmp_data/q_lambda_category.csv', 'w') as f:  # Just use 'w' mode in 3.x, otherwise 'wb'
         wr = csv.writer(f, quoting=csv.QUOTE_ALL)
         wr.writerow(qtable_keys)
     for key in qtable_keys:
         QL.q_table_category[key].to_csv("tmp_data/temp_q_lambda_" + key + ".csv", sep=',', encoding='utf-8')
-        # print(QL.q_table_category[key])
 
+    # plot the learning progress
     axes = plt.gca()
     axes.set_ylim([-1000, 1000])
     plt.figure(1)
@@ -158,13 +156,12 @@ def running(epi, time_in_ms, _is_render, QL, env):
 
 
 if __name__ == "__main__":
-    # set if render the GUI
-
+    # set if render the GUI of learning
     is_render = False
-    is_demo = False
-    # set number of runs
 
-    # episodes = 1200
+    # when is_demo set as True, no learning but running GUI to show the learning outcome
+    is_demo = False
+
     # set number of total steps
     total_steps = 5000  # 60000 for medium, 5000(0.5,0.8), 6000(0) for simple
 
@@ -183,9 +180,8 @@ if __name__ == "__main__":
 
     maze = MazeSmall(init_pos).init_maze(is_render)
     # maze = MazeMedium(init_pos).init_maze(is_render)
-    # maze = MazeLarge(init_pos).init_maze(is_render)
 
-    # initiate QLearner
+    # initialize QLearner
     actions = list(range(maze.n_actions))
     learning_rate = 0.1
     reward_gamma = 0.95

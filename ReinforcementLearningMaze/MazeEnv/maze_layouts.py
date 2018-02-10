@@ -1,5 +1,5 @@
 import numpy as np
-from ..MazeEnv.maze_env import MazeSimulator
+from MazeEnv.maze_env import MazeSimulator
 
 
 class MazeLarge:

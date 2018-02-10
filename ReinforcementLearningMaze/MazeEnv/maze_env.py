@@ -4,6 +4,7 @@ import tkinter as tk
 
 
 class MazeSimulator(tk.Tk, object):
+    # default values if not set when initialization
     step_penalty = 0
     pixel = 40
     anchor = pixel/2
@@ -256,6 +257,7 @@ class MazeSimulator(tk.Tk, object):
         is_done = False
         found_key = [obj for obj in self.key_list if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]
         checked_reward = self.step_penalty
+        # this part deals with finding a key
         if len(found_key) > 0:
             for key_obj in found_key:
                 if key_obj[1] not in self.agent_keys:
@@ -267,6 +269,7 @@ class MazeSimulator(tk.Tk, object):
                     self.key_list.remove(key_obj)
                     if key_obj[4] > -1:
                         self.canvas.delete(key_obj[4])
+        # this part deals with finding a chest (giving reward if a suitable key already found)
         else:
             found_chest = [obj for obj in self.chest_list if obj[0][0] == new_position[0] and obj[0][1] == new_position[1]]
             if len(found_chest) > 0:
