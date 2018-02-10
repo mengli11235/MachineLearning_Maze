@@ -4,7 +4,7 @@
 
 The following libraries are required before running this program:
 
-*tkinter
+* tkinter
 *numpy
 *pandas
 *matplotlib
